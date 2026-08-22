@@ -1066,6 +1066,39 @@ h1, h2, h3, h4, h5 {
   flex-wrap: wrap;
 }
 
+.live-surge-status {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-family: var(--font-mono);
+  border: 1px solid transparent;
+}
+.live-surge-status.ok {
+  background: var(--signal-low-bg);
+  color: var(--signal-low);
+  border-color: var(--signal-low);
+}
+.live-surge-status.err {
+  background: var(--signal-high-bg);
+  color: var(--signal-high);
+  border-color: var(--signal-high);
+}
+
+.btn-surge {
+  background: var(--signal-high-bg);
+  color: var(--signal-high);
+  border: 1px solid var(--signal-high);
+}
+.btn-surge:hover:not(:disabled) {
+  background: var(--signal-high);
+  color: var(--white);
+}
+.btn-surge:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .search-wrap {
   display: flex;
   align-items: center;

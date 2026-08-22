@@ -599,9 +599,12 @@ function renderQueueTable(filter = "ALL", searchQuery = "") {
       <td><span class="risk-chip ${riskClass}">${item.risk_level}</span></td>
       <td style="max-width:260px;font-size:0.8rem;line-height:1.45;color:var(--text-secondary);">${escapeHtml(primaryReason)}</td>
       <td style="max-width:220px;font-size:0.78rem;color:var(--text-secondary);">${escapeHtml(item.recommended_action)}</td>
-      <td>
-        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openAssetModal('${item.asset_id}')">
+      <td style="white-space:nowrap;">
+        <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openAssetModal('${item.asset_id}')" title="Inspect dossier">
           <i class="fa-solid fa-eye"></i>
+        </button>
+        <button class="btn btn-sm btn-surge" onclick="event.stopPropagation(); injectLiveSurge('${item.asset_id}', this)" title="Inject a live sensor surge on this asset (requires the live backend running)">
+          <i class="fa-solid fa-bolt"></i>
         </button>
       </td>
     `;
@@ -803,6 +806,46 @@ function renderLiveTickerFromChanges(changes) {
     if (c) {
       boil.innerHTML = `${escapeHtml(c.asset_id)} Temp: <strong class="${cls(c.risk_level)}">${fmt(c.temperature_c)}°C</strong>`;
     }
+  }
+}
+
+function showLiveSurgeStatus(message, ok) {
+  const el = document.getElementById("liveSurgeStatus");
+  if (!el) return;
+  el.textContent = message;
+  el.className = `live-surge-status ${ok ? "ok" : "err"}`;
+  el.style.display = "block";
+  clearTimeout(showLiveSurgeStatus._timer);
+  showLiveSurgeStatus._timer = setTimeout(() => { el.style.display = "none"; }, 6000);
+}
+
+async function injectLiveSurge(assetId, buttonEl) {
+  if (buttonEl) buttonEl.disabled = true;
+  try {
+    const res = await fetch(`${RISKPULSE_API_BASE}/api/simulate-surge/${encodeURIComponent(assetId)}`, { method: "POST" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const message = await res.json();
+    if (Array.isArray(message.evaluations) && message.evaluations.length > 0) {
+      applyLiveEvaluations(message.evaluations);
+    }
+    renderLiveTickerFromChanges(message.changed);
+    const changed = (message.changed || [])[0];
+    if (changed) {
+      showLiveSurgeStatus(
+        `⚡ Live surge injected on ${changed.asset_id} — risk now ${changed.risk_score}/100 (${changed.risk_level}).`,
+        true
+      );
+      if (changed.risk_level_changed) {
+        fetchAuditLogFromServer();
+      }
+    }
+  } catch (err) {
+    showLiveSurgeStatus(
+      `Live surge failed — is the RiskPulse API running (uvicorn execution.api_server:app --port 8787)? Falling back to local demo data only.`,
+      false
+    );
+  } finally {
+    if (buttonEl) buttonEl.disabled = false;
   }
 }
 

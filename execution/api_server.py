@@ -92,7 +92,15 @@ def _drift_asset(asset: Dict, force_surge: bool = False) -> bool:
     t_base = tel.get("baseline_temperature_c", 80.0)
 
     surge = force_surge or random.random() < 0.1
-    if surge:
+    if force_surge:
+        # Operator-triggered demo surge: set telemetry from baseline (not the
+        # current drifted value) so a single click reliably clears the
+        # RiskEngine catastrophic-override thresholds (pressure >45%, temp >35%
+        # over baseline) regardless of the asset's starting condition.
+        tel["pressure_psi"] = p_base * random.uniform(1.55, 1.75)
+        tel["temperature_c"] = t_base * random.uniform(1.42, 1.60)
+        tel["vibration_mms"] = random.uniform(9.0, 13.0)
+    elif surge:
         tel["pressure_psi"] = tel.get("pressure_psi", p_base) + p_base * random.uniform(0.18, 0.4)
         tel["temperature_c"] = tel.get("temperature_c", t_base) + t_base * random.uniform(0.15, 0.35)
         tel["vibration_mms"] = tel.get("vibration_mms", 1.0) + random.uniform(3.0, 6.0)
