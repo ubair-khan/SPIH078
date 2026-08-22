@@ -52,21 +52,21 @@ def run_riskpulse_pipeline(data_file: str = ".tmp/raw_assets_data.json", results
     low_count = sum(1 for e in evaluations if e["risk_level"] == "Low")
     
     print("-" * 70)
-    print(f"SAFETY SUMMARY: {len(evaluations)} Total Assets | 🔴 High: {high_count} | 🟡 Medium: {med_count} | 🟢 Low: {low_count}")
+    print(f"SAFETY SUMMARY: {len(evaluations)} Total Assets | HIGH: {high_count} | MEDIUM: {med_count} | LOW: {low_count}")
     print("-" * 70)
     print("TOP PRIORITY INSPECTION QUEUE (High & Critical Risks):")
     print("-" * 70)
     
     for item in evaluations:
         if item["risk_level"] in ("High", "Medium") and item["priority_rank"] <= 8:
-            indicator = "🔴 [HIGH]" if item["risk_level"] == "High" else "🟡 [MED] "
+            indicator = "[HIGH]" if item["risk_level"] == "High" else "[MED] "
             print(f"#{item['priority_rank']:02d} {indicator} Asset: {item['asset_id']} ({item['asset_type']}) - Score: {item['risk_score']}/100")
             print(f"    Location: {item['location']}")
             print(f"    Why Flagged: {item['explanation']}")
             print(f"    Action Plan: {item['recommended_action']}")
             print("-" * 70)
 
-    print("\n[✓] Pipeline execution finished successfully.")
+    print("\n[OK] Pipeline execution finished successfully.")
     return evaluations
 
 if __name__ == "__main__":

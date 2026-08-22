@@ -1,27 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RiskPulse — Industrial Safety Intelligence Platform</title>
-  <meta name="description" content="Predict industrial equipment failures before they happen. Explainable risk scoring, ranked inspection queues, and tamper-evident audit trails for OSHA & ISO 45001 compliance.">
-  <meta name="keywords" content="Industrial Safety, Risk Prediction, Predictive Maintenance, Asset Integrity, IoT Safety, OSHA Compliance, Explainable AI">
+  <meta name="description"
+    content="Predict industrial equipment failures before they happen. Explainable risk scoring, ranked inspection queues, and tamper-evident audit trails for OSHA & ISO 45001 compliance.">
+  <meta name="keywords"
+    content="Industrial Safety, Risk Prediction, Predictive Maintenance, Asset Integrity, IoT Safety, OSHA Compliance, Explainable AI">
 
   <!-- Open Graph -->
   <meta property="og:title" content="RiskPulse — Industrial Safety Intelligence">
-  <meta property="og:description" content="Spot patterns that point to safety hazards before accidents happen. Explainable risk scoring and ranked inspection queues.">
+  <meta property="og:description"
+    content="Spot patterns that point to safety hazards before accidents happen. Explainable risk scoring and ranked inspection queues.">
   <meta property="og:type" content="website">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;0,14..32,900&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
 
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
 
   <!-- Live Telemetry Ticker Bar -->
@@ -29,13 +36,15 @@
     <div class="ticker-inner">
       <span class="ticker-live"><span class="live-dot"></span> Live</span>
       <span class="ticker-sep">·</span>
-      <span class="ticker-item" id="tickerGas">COMP-003 Pressure: <strong class="t-warn">892 PSI (+11.5%)</strong></span>
+      <span class="ticker-item" id="tickerGas">COMP-003 Pressure: <strong class="t-warn">892 PSI
+          (+11.5%)</strong></span>
       <span class="ticker-sep">·</span>
       <span class="ticker-item" id="tickerBoil">BOIL-004 Temp: <strong class="t-danger">248°C (+18.1%)</strong></span>
       <span class="ticker-sep">·</span>
       <span class="ticker-item" id="tickerAudit">Fleet Health: <strong class="t-good">94.2% Operational</strong></span>
       <span class="ticker-sep">·</span>
-      <span class="ticker-item" id="tickerIncidents">Critical Queue: <strong class="t-danger" id="highRiskCountBadge">6 assets</strong></span>
+      <span class="ticker-item" id="tickerIncidents">Critical Queue: <strong class="t-danger" id="highRiskCountBadge">6
+          assets</strong></span>
     </div>
   </div>
 
@@ -59,7 +68,8 @@
       </nav>
 
       <div class="nav-actions">
-        <a href="https://github.com/ubair-khan/SPIH078" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
+        <a href="https://github.com/ubair-khan/SPIH078" target="_blank" rel="noopener noreferrer"
+          class="btn btn-secondary btn-sm">
           <i class="fa-brands fa-github"></i> GitHub
         </a>
         <button class="btn btn-primary btn-sm" id="btnLaunchDemo">
@@ -97,7 +107,8 @@
             </h1>
 
             <p class="hero-sub">
-              RiskPulse synthesizes maintenance logs, overdue inspections, failure history, and real-time telemetry into plain-language risk scores — ranked by true catastrophic potential.
+              RiskPulse synthesizes maintenance logs, overdue inspections, failure history, and real-time telemetry into
+              plain-language risk scores — ranked by true catastrophic potential.
             </p>
 
             <div class="hero-actions">
@@ -154,7 +165,8 @@
           <div class="section-head-content">
             <div class="section-label">Interactive Sandbox</div>
             <h2 class="section-title">Risk Scoring &amp;<br>Explanation Engine</h2>
-            <p class="section-desc">Select an asset or tune operating parameters to watch the deterministic scoring algorithm and plain-language reasoning update in real time.</p>
+            <p class="section-desc">Select an asset or tune operating parameters to watch the deterministic scoring
+              algorithm and plain-language reasoning update in real time.</p>
           </div>
         </div>
 
@@ -196,7 +208,8 @@
                   <span class="control-value mono" id="valFailures">4 incidents</span>
                 </div>
                 <input type="range" id="sliderFailures" min="0" max="8" value="4" class="styled-range">
-                <div class="control-hint">Severity: <span id="labelSeverity" style="color: var(--signal-high); font-weight: 700;">Critical</span></div>
+                <div class="control-hint">Severity: <span id="labelSeverity"
+                    style="color: var(--signal-high); font-weight: 700;">Critical</span></div>
               </div>
 
               <!-- Pressure -->
@@ -281,7 +294,8 @@
               <div class="score-details">
                 <span class="risk-chip high" id="displayRiskBadge">High Risk</span>
                 <div class="score-asset" id="displayAssetName">Gas Compressor COMP-003</div>
-                <div class="score-location" id="displayAssetLocation"><i class="fa-solid fa-location-dot"></i> Offshore Platform North</div>
+                <div class="score-location" id="displayAssetLocation"><i class="fa-solid fa-location-dot"></i> Offshore
+                  Platform North</div>
                 <div class="score-rank mono" id="displayRankLabel">Priority Rank #01</div>
               </div>
             </div>
@@ -290,31 +304,43 @@
             <div class="factor-list">
               <div class="factor-item">
                 <div class="factor-head">
-                  <span class="factor-name">Maintenance Risk <span style="color:var(--text-meta);font-weight:400;">(25%)</span></span>
+                  <span class="factor-name">Maintenance Risk <span
+                      style="color:var(--text-meta);font-weight:400;">(25%)</span></span>
                   <span class="factor-pct" id="scoreMaint">82%</span>
                 </div>
-                <div class="track"><div class="track-fill high" id="barMaint" style="width:82%"></div></div>
+                <div class="track">
+                  <div class="track-fill high" id="barMaint" style="width:82%"></div>
+                </div>
               </div>
               <div class="factor-item">
                 <div class="factor-head">
-                  <span class="factor-name">Failure Recurrence <span style="color:var(--text-meta);font-weight:400;">(30%)</span></span>
+                  <span class="factor-name">Failure Recurrence <span>
+                      style="color:var(--text-meta);font-weight:400;">(30%)</span></span>
                   <span class="factor-pct" id="scoreFail">95%</span>
                 </div>
-                <div class="track"><div class="track-fill high" id="barFail" style="width:95%"></div></div>
+                <div class="track">
+                  <div class="track-fill high" id="barFail" style="width:95%"></div>
+                </div>
               </div>
               <div class="factor-item">
                 <div class="factor-head">
-                  <span class="factor-name">Telemetry Anomaly <span style="color:var(--text-meta);font-weight:400;">(30%)</span></span>
+                  <span class="factor-name">Telemetry Anomaly <span>
+                      style="color:var(--text-meta);font-weight:400;">(30%)</span></span>
                   <span class="factor-pct" id="scoreTelemetry">78%</span>
                 </div>
-                <div class="track"><div class="track-fill medium" id="barTelemetry" style="width:78%"></div></div>
+                <div class="track">
+                  <div class="track-fill medium" id="barTelemetry" style="width:78%"></div>
+                </div>
               </div>
               <div class="factor-item">
                 <div class="factor-head">
-                  <span class="factor-name">Audit Violations <span style="color:var(--text-meta);font-weight:400;">(15%)</span></span>
+                  <span class="factor-name">Audit Violations <span>
+                      style="color:var(--text-meta);font-weight:400;">(15%)</span></span>
                   <span class="factor-pct" id="scoreAuditFactor">65%</span>
                 </div>
-                <div class="track"><div class="track-fill medium" id="barAuditFactor" style="width:65%"></div></div>
+                <div class="track">
+                  <div class="track-fill medium" id="barAuditFactor" style="width:65%"></div>
+                </div>
               </div>
             </div>
 
@@ -322,7 +348,9 @@
             <div class="intel-block">
               <div class="intel-head">Plain-Language Explanation</div>
               <p class="intel-body" id="displayExplanation">
-                Maintenance is overdue by 120 days. Recorded 4 failure incidents in the last 90 days (severity: Critical). Operating pressure (920 PSI) is 15.0% above standard baseline. Thermal reading (125°C) is 31.6% elevated. Excessive mechanical vibration at 8.4 mm/s.
+                Maintenance is overdue by 120 days. Recorded 4 failure incidents in the last 90 days (severity:
+                Critical). Operating pressure (920 PSI) is 15.0% above standard baseline. Thermal reading (125°C) is
+                31.6% elevated. Excessive mechanical vibration at 8.4 mm/s.
               </p>
             </div>
 
@@ -359,7 +387,8 @@
           <div class="section-head-content">
             <div class="section-label">Core System Pillars</div>
             <h2 class="section-title">Built for real-world<br>industrial resilience.</h2>
-            <p class="section-desc">Safety teams cannot act on black-box predictions. RiskPulse delivers explainability, prioritization, and verifiable auditability.</p>
+            <p class="section-desc">Safety teams cannot act on black-box predictions. RiskPulse delivers explainability,
+              prioritization, and verifiable auditability.</p>
           </div>
         </div>
 
@@ -370,9 +399,12 @@
             <span class="pillar-num mono">01</span>
             <div class="pillar-icon"><i class="fa-solid fa-comments"></i></div>
             <div class="pillar-title">Plain-Language Explainability</div>
-            <p class="pillar-desc">A red flag alone does not help an inspector. RiskPulse unpacks every risk score into intuitive, natural language root causes — explaining exact maintenance delays, failure patterns, and sensor drift.</p>
+            <p class="pillar-desc">A red flag alone does not help an inspector. RiskPulse unpacks every risk score into
+              intuitive, natural language root causes — explaining exact maintenance delays, failure patterns, and
+              sensor drift.</p>
             <div class="mock-quote">
-              "Asset is 120 days overdue for overhaul, logged 4 critical failure incidents,<br>and temperature is 31.6% above safe baseline."
+              "Asset is 120 days overdue for overhaul, logged 4 critical failure incidents,<br>and temperature is 31.6%
+              above safe baseline."
             </div>
           </div>
 
@@ -381,7 +413,8 @@
             <span class="pillar-num mono">02</span>
             <div class="pillar-icon"><i class="fa-solid fa-arrow-down-short-wide"></i></div>
             <div class="pillar-title">Inspection Priority Ranking</div>
-            <p class="pillar-desc">Inspectors have limited time. The engine sorts assets by true catastrophic risk — dispatching teams to the most hazardous locations first, not alphabetically.</p>
+            <p class="pillar-desc">Inspectors have limited time. The engine sorts assets by true catastrophic risk —
+              dispatching teams to the most hazardous locations first, not alphabetically.</p>
           </div>
 
           <!-- 03 Directives -->
@@ -389,7 +422,8 @@
             <span class="pillar-num mono">03</span>
             <div class="pillar-icon"><i class="fa-solid fa-compass-drafting"></i></div>
             <div class="pillar-title">Actionable Directives</div>
-            <p class="pillar-desc">Every alert includes a definitive resolution protocol: immediate shutdown, high-priority overhaul, preventative calibration, or targeted monitoring.</p>
+            <p class="pillar-desc">Every alert includes a definitive resolution protocol: immediate shutdown,
+              high-priority overhaul, preventative calibration, or targeted monitoring.</p>
           </div>
 
           <!-- 04 Messy Data -->
@@ -397,7 +431,8 @@
             <span class="pillar-num mono">04</span>
             <div class="pillar-icon"><i class="fa-solid fa-database"></i></div>
             <div class="pillar-title">Messy Data Resilience</div>
-            <p class="pillar-desc">Industrial records are incomplete and inconsistent. Our ingestion layer gracefully normalizes missing timestamps, null readings, and varied equipment ontologies.</p>
+            <p class="pillar-desc">Industrial records are incomplete and inconsistent. Our ingestion layer gracefully
+              normalizes missing timestamps, null readings, and varied equipment ontologies.</p>
           </div>
 
           <!-- 05 Audit Trail — full width -->
@@ -408,9 +443,12 @@
               <div class="pillar-title">Tamper-Evident Audit Trail</div>
             </div>
             <div>
-              <p class="pillar-desc">Trust requires a trail. When life-critical decisions are made, every sensor snapshot, rule firing, and score calculation is permanently archived with UTC timestamps for OSHA &amp; ISO 45001 audits.</p>
+              <p class="pillar-desc">Trust requires a trail. When life-critical decisions are made, every sensor
+                snapshot, rule firing, and score calculation is permanently archived with UTC timestamps for OSHA &amp;
+                ISO 45001 audits.</p>
               <div class="mock-quote" style="margin-top:20px;">
-                {&nbsp;"ts": "2026-08-22T13:05:11Z",&nbsp;"asset": "COMP-003",&nbsp;"score": 84.6,&nbsp;"verdict": "HIGH",&nbsp;"hash": "sha256:a3f7c2..."&nbsp;}
+                {&nbsp;"ts": "2026-08-22T13:05:11Z",&nbsp;"asset": "COMP-003",&nbsp;"score": 84.6,&nbsp;"verdict":
+                "HIGH",&nbsp;"hash": "sha256:a3f7c2..."&nbsp;}
               </div>
             </div>
           </div>
@@ -430,20 +468,25 @@
           <div class="section-head-content">
             <div class="section-label">Field Operations</div>
             <h2 class="section-title">Ranked Asset<br>Inspection Queue</h2>
-            <p class="section-desc">Live priority queue sorted by severity. Click any asset to inspect telemetry history, maintenance delinquencies, and safety audit logs.</p>
+            <p class="section-desc">Live priority queue sorted by severity. Click any asset to inspect telemetry
+              history, maintenance delinquencies, and safety audit logs.</p>
           </div>
         </div>
 
         <div class="queue-toolbar">
           <div class="search-wrap">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="queueSearchInput" placeholder="Search asset ID, type, or location…" aria-label="Search assets">
+            <input type="text" id="queueSearchInput" placeholder="Search asset ID, type, or location…"
+              aria-label="Search assets">
           </div>
           <div class="filter-row" id="filterPills">
             <button class="filter-btn active" data-filter="ALL">All (<span id="countAll">25</span>)</button>
-            <button class="filter-btn" data-filter="High"><span class="badge-dot danger"></span> High (<span id="countHigh">6</span>)</button>
-            <button class="filter-btn" data-filter="Medium"><span class="badge-dot warning"></span> Medium (<span id="countMed">9</span>)</button>
-            <button class="filter-btn" data-filter="Low"><span class="badge-dot success"></span> Low (<span id="countLow">10</span>)</button>
+            <button class="filter-btn" data-filter="High"><span class="badge-dot danger"></span> High (<span
+                id="countHigh">6</span>)</button>
+            <button class="filter-btn" data-filter="Medium"><span class="badge-dot warning"></span> Medium (<span
+                id="countMed">9</span>)</button>
+            <button class="filter-btn" data-filter="Low"><span class="badge-dot success"></span> Low (<span
+                id="countLow">10</span>)</button>
           </div>
         </div>
 
@@ -481,7 +524,8 @@
           <div class="section-head-content">
             <div class="section-label">Compliance &amp; Governance</div>
             <h2 class="section-title">Tamper-Evident<br>Audit Trail Log</h2>
-            <p class="section-desc">Immutable log capturing the exact data snapshot, rule evaluation, and reasoning behind every decision.</p>
+            <p class="section-desc">Immutable log capturing the exact data snapshot, rule evaluation, and reasoning
+              behind every decision.</p>
           </div>
         </div>
 
@@ -519,7 +563,8 @@
           <div class="section-head-content">
             <div class="section-label">Architecture Note</div>
             <h2 class="section-title">Live IoT Sensor<br>Streaming Design</h2>
-            <p class="section-desc">How RiskPulse scales from batch logs to millions of real-time MQTT, OPC-UA, and Kafka telemetry events per second.</p>
+            <p class="section-desc">How RiskPulse scales from batch logs to millions of real-time MQTT, OPC-UA, and
+              Kafka telemetry events per second.</p>
           </div>
         </div>
 
@@ -530,28 +575,33 @@
             <div class="pipeline-step">
               <span class="step-num mono">01</span>
               <div class="step-content">
-                <div class="step-title"><i class="fa-solid fa-microchip" style="margin-right:8px;color:var(--text-meta);"></i>Edge Sensors</div>
+                <div class="step-title"><i class="fa-solid fa-microchip"
+                    style="margin-right:8px;color:var(--text-meta);"></i>Edge Sensors</div>
                 <p class="step-desc">OPC-UA, Modbus, MQTT telemetry at 100 Hz from pumps, boilers, and reactors.</p>
               </div>
             </div>
             <div class="pipeline-step">
               <span class="step-num mono">02</span>
               <div class="step-content">
-                <div class="step-title"><i class="fa-solid fa-server" style="margin-right:8px;color:var(--text-meta);"></i>Stream Worker</div>
+                <div class="step-title"><i class="fa-solid fa-server"
+                    style="margin-right:8px;color:var(--text-meta);"></i>Stream Worker</div>
                 <p class="step-desc">Apache Flink / Kafka calculating 5-min rolling EMAs and dynamic baseline drift.</p>
               </div>
             </div>
             <div class="pipeline-step highlighted">
               <span class="step-num mono">03</span>
               <div class="step-content">
-                <div class="step-title"><i class="fa-solid fa-brain" style="margin-right:8px;color:var(--text-meta);"></i>RiskPulse Engine</div>
-                <p class="step-desc">Deterministic re-scoring &amp; stateful early-warning transition detection across 25 assets.</p>
+                <div class="step-title"><i class="fa-solid fa-brain"
+                    style="margin-right:8px;color:var(--text-meta);"></i>RiskPulse Engine</div>
+                <p class="step-desc">Deterministic re-scoring &amp; stateful early-warning transition detection across
+                  25 assets.</p>
               </div>
             </div>
             <div class="pipeline-step">
               <span class="step-num mono">04</span>
               <div class="step-content">
-                <div class="step-title"><i class="fa-solid fa-tower-broadcast" style="margin-right:8px;color:var(--text-meta);"></i>Instant Dispatch</div>
+                <div class="step-title"><i class="fa-solid fa-tower-broadcast"
+                    style="margin-right:8px;color:var(--text-meta);"></i>Instant Dispatch</div>
                 <p class="step-desc">Sub-second webhook &amp; WebSocket alerts to floor inspectors' rugged tablets.</p>
               </div>
             </div>
@@ -597,7 +647,8 @@ def on_telemetry_packet(event):
             <div class="footer-brand-mark"><i class="fa-solid fa-shield-halved"></i></div>
             <span class="footer-brand-name">RiskPulse</span>
           </div>
-          <p class="footer-desc">Explainable industrial safety risk intelligence. Built for PS-04 to prevent catastrophic workplace failures through deterministic scoring and plain-language reasoning.</p>
+          <p class="footer-desc">Explainable industrial safety risk intelligence. Built for PS-04 to prevent
+            catastrophic workplace failures through deterministic scoring and plain-language reasoning.</p>
         </div>
         <div class="footer-col">
           <h5>Navigation</h5>
@@ -609,7 +660,8 @@ def on_telemetry_packet(event):
         </div>
         <div class="footer-col">
           <h5>Standards &amp; Code</h5>
-          <a href="https://github.com/ubair-khan/SPIH078" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub Repository</a>
+          <a href="https://github.com/ubair-khan/SPIH078" target="_blank" rel="noopener noreferrer"><i
+              class="fa-brands fa-github"></i> GitHub Repository</a>
           <a href="directives/risk_pulse_pipeline.md"><i class="fa-solid fa-book"></i> SOP Directives</a>
           <a href="execution/risk_engine.py"><i class="fa-solid fa-code"></i> Python Engine</a>
           <span>ISO 45001 &amp; OSHA Compliant</span>
@@ -618,7 +670,8 @@ def on_telemetry_packet(event):
       <div class="footer-bottom">
         <span>© 2026 RiskPulse · Industrial AI Safety Systems</span>
         <span>
-          <a href="https://github.com/ubair-khan/SPIH078" target="_blank" rel="noopener noreferrer">github.com/ubair-khan/SPIH078</a>
+          <a href="https://github.com/ubair-khan/SPIH078" target="_blank"
+            rel="noopener noreferrer">github.com/ubair-khan/SPIH078</a>
         </span>
       </div>
     </div>
@@ -638,8 +691,10 @@ def on_telemetry_packet(event):
         <!-- Filled via JS -->
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary btn-sm" id="modalCopyJsonBtn"><i class="fa-regular fa-copy"></i> Copy Raw JSON</button>
-        <button class="btn btn-primary btn-sm" id="modalLoadToSimBtn"><i class="fa-solid fa-sliders"></i> Load into Simulator</button>
+        <button class="btn btn-secondary btn-sm" id="modalCopyJsonBtn"><i class="fa-regular fa-copy"></i> Copy Raw
+          JSON</button>
+        <button class="btn btn-primary btn-sm" id="modalLoadToSimBtn"><i class="fa-solid fa-sliders"></i> Load into
+          Simulator</button>
       </div>
     </div>
   </div>
@@ -658,12 +713,15 @@ def on_telemetry_packet(event):
         <!-- Populated via JS -->
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary btn-sm" id="btnPrintReportBtn"><i class="fa-solid fa-print"></i> Print / Save PDF</button>
-        <button class="btn btn-primary btn-sm" id="btnDownloadReportMd"><i class="fa-solid fa-file-arrow-down"></i> Download Markdown</button>
+        <button class="btn btn-secondary btn-sm" id="btnPrintReportBtn"><i class="fa-solid fa-print"></i> Print / Save
+          PDF</button>
+        <button class="btn btn-primary btn-sm" id="btnDownloadReportMd"><i class="fa-solid fa-file-arrow-down"></i>
+          Download Markdown</button>
       </div>
     </div>
   </div>
 
   <script src="app.js"></script>
 </body>
+
 </html>

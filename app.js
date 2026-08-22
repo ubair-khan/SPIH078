@@ -302,10 +302,10 @@ class ClientRiskEngine {
     if (failCount > 0) {
       reasons.push(`Recorded ${failCount} failure incident(s) in past 90 days (Recent severity: ${lastSev}).`);
     }
-    if (pDelta > 0.10) {
+    if (pDelta > 0.15) {
       reasons.push(`Operating pressure (${pVal.toFixed(1)} PSI) is ${(pDelta * 100).toFixed(1)}% above nominal baseline (${pBase.toFixed(1)} PSI).`);
     }
-    if (tDelta > 0.10) {
+    if (tDelta > 0.12) {
       reasons.push(`Thermal reading (${tVal.toFixed(1)}°C) is ${(tDelta * 100).toFixed(1)}% elevated over rating (${tBase.toFixed(1)}°C).`);
     }
     if (vVal > vThresh) {
@@ -370,6 +370,12 @@ let currentEvaluations = engine.evaluateAll(MOCK_ASSETS);
 let currentSimAsset = { ...MOCK_ASSETS[0] };
 let auditLogEntries = [];
 
+function escapeHtml(value) {
+  return String(value).replace(/[&<>'"]/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+  }[character]));
+}
+
 // Initialize In-Memory Audit Logs from initial evaluations
 function initAuditLog() {
   auditLogEntries = currentEvaluations.map(ev => ({
@@ -381,13 +387,17 @@ function initAuditLog() {
     risk_score: ev.risk_score,
     risk_level: ev.risk_level,
     decision_factors: ev.contributing_factors,
+    component_breakdown: ev.component_scores,
     recommended_action: ev.recommended_action,
     raw_snapshot: {
       days_since_maint: ev.raw.maintenance.days_since_last_maintenance,
       failures_90d: ev.raw.failures.failures_last_90d,
+    last_incident_severity: ev.raw.failures.last_incident_severity,
       pressure_psi: ev.raw.sensor_telemetry.pressure_psi,
       temperature_c: ev.raw.sensor_telemetry.temperature_c,
-      vibration_mms: ev.raw.sensor_telemetry.vibration_mms
+    vibration_mms: ev.raw.sensor_telemetry.vibration_mms,
+    audit_score: ev.raw.safety_audit.audit_score,
+    unresolved_violations: ev.raw.safety_audit.unresolved_violations
     }
   }));
 }
@@ -493,7 +503,7 @@ function recalculateSimulator() {
   // Render Gauge & Score
   document.getElementById("displayScore").textContent = result.risk_score.toFixed(1);
   document.getElementById("displayAssetName").textContent = `${result.asset_id} — ${result.asset_type}`;
-  document.getElementById("displayAssetLocation").innerHTML = `<i class="fa-solid fa-location-dot"></i> ${result.location}`;
+  document.getElementById("displayAssetLocation").innerHTML = `<i class="fa-solid fa-location-dot"></i> ${escapeHtml(result.location)}`;
   
   const badge = document.getElementById("displayRiskBadge");
   badge.className = `risk-chip ${result.risk_level.toLowerCase()}`;
@@ -573,14 +583,14 @@ function renderQueueTable(filter = "ALL", searchQuery = "") {
     tr.innerHTML = `
       <td><span class="priority-num">#${String(item.priority_rank).padStart(2, '0')}</span></td>
       <td>
-        <span class="asset-id">${item.asset_id}</span>
-        <span class="asset-type">${item.asset_type}</span>
+        <span class="asset-id">${escapeHtml(item.asset_id)}</span>
+        <span class="asset-type">${escapeHtml(item.asset_type)}</span>
       </td>
-      <td style="font-size:0.84rem;color:var(--text-secondary);">${item.location}</td>
+      <td style="font-size:0.84rem;color:var(--text-secondary);">${escapeHtml(item.location)}</td>
       <td><span class="score-val ${scoreClass}">${item.risk_score}</span></td>
       <td><span class="risk-chip ${riskClass}">${item.risk_level}</span></td>
-      <td style="max-width:260px;font-size:0.8rem;line-height:1.45;color:var(--text-secondary);">${primaryReason}</td>
-      <td style="max-width:220px;font-size:0.78rem;color:var(--text-secondary);">${item.recommended_action}</td>
+      <td style="max-width:260px;font-size:0.8rem;line-height:1.45;color:var(--text-secondary);">${escapeHtml(primaryReason)}</td>
+      <td style="max-width:220px;font-size:0.78rem;color:var(--text-secondary);">${escapeHtml(item.recommended_action)}</td>
       <td>
         <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openAssetModal('${item.asset_id}')">
           <i class="fa-solid fa-eye"></i>
@@ -606,11 +616,11 @@ function renderAuditLog() {
     div.innerHTML = `
       <div class="audit-entry-top">
         <span class="audit-ts">${entry.timestamp.replace('T', ' ').substring(0, 19)} UTC</span>
-        <span class="audit-tag">${entry.asset_id} · ${entry.asset_type}</span>
+        <span class="audit-tag">${escapeHtml(entry.asset_id)} · ${escapeHtml(entry.asset_type)}</span>
         <span class="audit-verdict ${riskClass}">${entry.risk_level.toUpperCase()} · ${entry.risk_score}</span>
       </div>
-      <div class="audit-reason">${entry.decision_factors.join(' ') || 'All nominal thresholds observed.'}</div>
-      <div class="audit-action">→ ${entry.recommended_action}</div>
+      <div class="audit-reason">${escapeHtml(entry.decision_factors.join(' ') || 'All nominal thresholds observed.')}</div>
+      <div class="audit-action">→ ${escapeHtml(entry.recommended_action)}</div>
     `;
     container.appendChild(div);
   });
@@ -640,27 +650,27 @@ function openAssetModal(assetId) {
       <div style="background:var(--bg-raised);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border);">
         <h4 style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-meta);margin-bottom:10px;">Sensor Telemetry</h4>
         <div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.7;">
-          <div>Pressure: <strong style="color:var(--text-primary);">${tel.pressure_psi} PSI</strong> (Nominal: ${tel.baseline_pressure_psi} PSI)</div>
-          <div>Temperature: <strong style="color:var(--text-primary);">${tel.temperature_c}°C</strong> (Nominal: ${tel.baseline_temperature_c}°C)</div>
-          <div>Vibration: <strong style="color:var(--text-primary);">${tel.vibration_mms} mm/s</strong> (Safe: ${tel.vibration_threshold_mms} mm/s)</div>
+          <div>Pressure: <strong style="color:var(--text-primary);">${escapeHtml(tel.pressure_psi)} PSI</strong> (Nominal: ${escapeHtml(tel.baseline_pressure_psi)} PSI)</div>
+          <div>Temperature: <strong style="color:var(--text-primary);">${escapeHtml(tel.temperature_c)}°C</strong> (Nominal: ${escapeHtml(tel.baseline_temperature_c)}°C)</div>
+          <div>Vibration: <strong style="color:var(--text-primary);">${escapeHtml(tel.vibration_mms)} mm/s</strong> (Safe: ${escapeHtml(tel.vibration_threshold_mms)} mm/s)</div>
         </div>
       </div>
       <div style="background:var(--bg-raised);padding:16px;border-radius:var(--radius-sm);border:1px solid var(--border);">
         <h4 style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-meta);margin-bottom:10px;">Maintenance &amp; Audit</h4>
         <div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.7;">
-          <div>Last Serviced: <strong style="color:var(--text-primary);">${maint.days_since_last_maintenance} days ago</strong></div>
-          <div>Failures (90d): <strong style="color:var(--text-primary);">${fail.failures_last_90d}</strong> · ${fail.last_incident_severity}</div>
-          <div>Audit Score: <strong style="color:var(--text-primary);">${audit.audit_score}/100</strong> · ${audit.unresolved_violations} violations</div>
+          <div>Last Serviced: <strong style="color:var(--text-primary);">${escapeHtml(maint.days_since_last_maintenance)} days ago</strong></div>
+          <div>Failures (90d): <strong style="color:var(--text-primary);">${escapeHtml(fail.failures_last_90d)}</strong> · ${escapeHtml(fail.last_incident_severity)}</div>
+          <div>Audit Score: <strong style="color:var(--text-primary);">${escapeHtml(audit.audit_score)}/100</strong> · ${escapeHtml(audit.unresolved_violations)} violations</div>
         </div>
       </div>
     </div>
     <div style="border-left:2px solid var(--border-mid);padding:12px 16px;">
       <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-meta);margin-bottom:6px;">Plain-Language Reasoning</div>
-      <p style="font-size:0.875rem;color:var(--text-secondary);line-height:1.6;">${found.explanation}</p>
+      <p style="font-size:0.875rem;color:var(--text-secondary);line-height:1.6;">${escapeHtml(found.explanation)}</p>
     </div>
     <div style="border-left:2px solid var(--accent);padding:12px 16px;">
       <div style="font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);margin-bottom:6px;">Recommended Action</div>
-      <p style="font-size:0.875rem;color:var(--text-secondary);line-height:1.6;">${found.recommended_action}</p>
+      <p style="font-size:0.875rem;color:var(--text-secondary);line-height:1.6;">${escapeHtml(found.recommended_action)}</p>
     </div>
   `;
 
@@ -696,11 +706,11 @@ function openReportModal() {
   let highHtml = high.map(h => `
     <div style="background:var(--bg-raised);border:1px solid var(--border);border-left:2px solid var(--accent);padding:14px 16px;border-radius:var(--radius-sm);margin-bottom:8px;">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
-        <span style="font-size:0.88rem;font-weight:700;color:var(--text-primary);">#${h.priority_rank} ${h.asset_id} &mdash; ${h.asset_type}</span>
-        <span style="font-size:0.72rem;color:var(--text-meta);font-family:var(--font-mono);">${h.risk_score}/100 · ${h.location}</span>
+        <span style="font-size:0.88rem;font-weight:700;color:var(--text-primary);">#${h.priority_rank} ${escapeHtml(h.asset_id)} &mdash; ${escapeHtml(h.asset_type)}</span>
+        <span style="font-size:0.72rem;color:var(--text-meta);font-family:var(--font-mono);">${h.risk_score}/100 · ${escapeHtml(h.location)}</span>
       </div>
-      <div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">${h.explanation}</div>
-      <div style="font-size:0.78rem;color:var(--text-meta);">→ ${h.recommended_action}</div>
+      <div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:4px;">${escapeHtml(h.explanation)}</div>
+      <div style="font-size:0.78rem;color:var(--text-meta);">→ ${escapeHtml(h.recommended_action)}</div>
     </div>
   `).join("");
 
@@ -781,14 +791,21 @@ document.addEventListener("DOMContentLoaded", () => {
       asset_id: res.asset_id,
       asset_type: res.asset_type,
       location: res.location,
-      priority_rank: 1,
+      priority_rank: currentEvaluations.find(item => item.asset_id === res.asset_id)?.priority_rank,
       risk_score: res.risk_score,
       risk_level: res.risk_level,
       decision_factors: res.contributing_factors,
+      component_breakdown: res.component_scores,
       recommended_action: res.recommended_action,
       raw_snapshot: {
+        days_since_maint: parseInt(document.getElementById("sliderMaintDays").value, 10),
+        failures_90d: parseInt(document.getElementById("sliderFailures").value, 10),
+        last_incident_severity: res.raw.failures.last_incident_severity,
         pressure_psi: parseFloat(document.getElementById("sliderPressure").value),
-        temperature_c: parseFloat(document.getElementById("sliderTemp").value)
+        temperature_c: parseFloat(document.getElementById("sliderTemp").value),
+        vibration_mms: parseFloat(document.getElementById("sliderVib").value),
+        audit_score: parseInt(document.getElementById("sliderAudit").value, 10),
+        unresolved_violations: res.raw.safety_audit.unresolved_violations
       }
     };
     auditLogEntries.unshift(newEntry);
@@ -799,6 +816,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // View Dossier from simulator
   document.getElementById("btnInspectDossier").addEventListener("click", () => {
     openAssetModal(currentSimAsset.asset_id);
+  });
+
+  document.getElementById("btnClearSimLogs").addEventListener("click", () => {
+    initAuditLog();
+    renderAuditLog();
   });
 
   // Filter Buttons for Queue

@@ -5,6 +5,7 @@ has a traceable, tamper-evident log entry recording input metrics and reasoning.
 """
 
 import json
+import hashlib
 import os
 from datetime import datetime
 from typing import Dict, Any, List
@@ -12,7 +13,21 @@ from typing import Dict, Any, List
 class AuditLogger:
     def __init__(self, log_path: str = ".tmp/audit_log.jsonl"):
         self.log_path = log_path
-        os.makedirs(os.path.dirname(self.log_path), exist_ok=True)
+        directory = os.path.dirname(self.log_path)
+        if directory:
+            os.makedirs(directory, exist_ok=True)
+
+    def _previous_hash(self) -> str:
+        if not os.path.exists(self.log_path):
+            return "0" * 64
+        with open(self.log_path, "r", encoding="utf-8") as f:
+            lines = [line for line in f if line.strip()]
+        if not lines:
+            return "0" * 64
+        try:
+            return json.loads(lines[-1]).get("hash", "0" * 64)
+        except (json.JSONDecodeError, AttributeError):
+            return "0" * 64
 
     def log_assessment(self, original_asset: Dict[str, Any], evaluation: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -41,11 +56,36 @@ class AuditLogger:
                 "unresolved_violations": original_asset.get("safety_audit", {}).get("unresolved_violations")
             }
         }
+
+        entry["previous_hash"] = self._previous_hash()
+        payload = json.dumps(entry, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        entry["hash"] = hashlib.sha256(payload).hexdigest()
         
         with open(self.log_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(entry) + "\n")
             
         return entry
+
+    def verify(self) -> bool:
+        previous_hash = "0" * 64
+        if not os.path.exists(self.log_path):
+            return True
+        with open(self.log_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                try:
+                    entry = json.loads(line)
+                except json.JSONDecodeError:
+                    return False
+                recorded_hash = entry.pop("hash", None)
+                if entry.get("previous_hash") != previous_hash:
+                    return False
+                payload = json.dumps(entry, sort_keys=True, separators=(",", ":")).encode("utf-8")
+                if hashlib.sha256(payload).hexdigest() != recorded_hash:
+                    return False
+                previous_hash = recorded_hash
+        return True
 
     def log_batch(self, raw_assets: List[Dict[str, Any]], evaluations: List[Dict[str, Any]]) -> int:
         raw_map = {a.get("asset_id"): a for a in raw_assets}

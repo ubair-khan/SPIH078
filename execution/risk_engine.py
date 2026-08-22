@@ -5,7 +5,8 @@ Evaluates historical maintenance, failure logs, safety audits, and sensor metric
 to compute risk score, category, plain-language explanations, and recommended actions.
 """
 
-from typing import Dict, Any, List, Tuple
+import math
+from typing import Dict, Any, List
 
 class RiskEngine:
     def __init__(self):
@@ -14,6 +15,14 @@ class RiskEngine:
         self.w_failures = 0.30
         self.w_telemetry = 0.30
         self.w_audit = 0.15
+
+    @staticmethod
+    def _number(value: Any, default: float) -> float:
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            return default
+        return number if math.isfinite(number) else default
 
     def evaluate_asset(self, asset: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -29,24 +38,30 @@ class RiskEngine:
         telemetry = asset.get("sensor_telemetry", {})
         
         # 1. Maintenance Component Score (0 - 100)
-        days_since_m = maint.get("days_since_last_maintenance", 0)
-        interval = maint.get("recommended_interval_days", 90)
+        days_since_m = max(0.0, self._number(maint.get("days_since_last_maintenance"), 0.0))
+        interval = max(1.0, self._number(maint.get("recommended_interval_days"), 90.0))
         overdue_ratio = max(0.0, (days_since_m - interval) / interval)
         maint_score = min(100.0, overdue_ratio * 50.0 + (30.0 if days_since_m > interval else 0.0))
         
         # 2. Failures Component Score (0 - 100)
-        fail_count_90d = failures.get("failures_last_90d", 0)
-        last_sev = failures.get("last_incident_severity", "None")
+        fail_count_90d = max(0.0, self._number(failures.get("failures_last_90d"), 0.0))
+        last_sev = str(failures.get("last_incident_severity") or "None").strip().title()
         sev_multiplier = {"None": 0.0, "Minor": 10.0, "Moderate": 25.0, "Critical": 45.0, "Catastrophic": 60.0}.get(last_sev, 10.0)
         fail_score = min(100.0, (fail_count_90d * 20.0) + sev_multiplier)
         
         # 3. Telemetry Anomaly Score (0 - 100)
-        p_val = telemetry.get("pressure_psi", 0.0)
-        p_base = max(1.0, telemetry.get("baseline_pressure_psi", 1.0))
-        t_val = telemetry.get("temperature_c", 0.0)
-        t_base = max(1.0, telemetry.get("baseline_temperature_c", 1.0))
-        vib_val = telemetry.get("vibration_mms", 0.0)
-        vib_thresh = max(1.0, telemetry.get("vibration_threshold_mms", 5.0))
+        telemetry_values = [
+            telemetry.get("pressure_psi"), telemetry.get("baseline_pressure_psi"),
+            telemetry.get("temperature_c"), telemetry.get("baseline_temperature_c"),
+            telemetry.get("vibration_mms"), telemetry.get("vibration_threshold_mms")
+        ]
+        telemetry_available = all(value is not None for value in telemetry_values)
+        p_val = self._number(telemetry.get("pressure_psi"), 0.0)
+        p_base = max(1.0, self._number(telemetry.get("baseline_pressure_psi"), 1.0))
+        t_val = self._number(telemetry.get("temperature_c"), 0.0)
+        t_base = max(1.0, self._number(telemetry.get("baseline_temperature_c"), 1.0))
+        vib_val = self._number(telemetry.get("vibration_mms"), 0.0)
+        vib_thresh = max(1.0, self._number(telemetry.get("vibration_threshold_mms"), 5.0))
         
         p_delta = max(0.0, (p_val - p_base) / p_base)
         t_delta = max(0.0, (t_val - t_base) / t_base)
@@ -55,17 +70,24 @@ class RiskEngine:
         telemetry_score = min(100.0, (p_delta * 120.0) + (t_delta * 120.0) + (vib_delta * 80.0))
         
         # 4. Safety Audit Component Score (0 - 100)
-        raw_audit_score = audit.get("audit_score", 100)
-        violations = audit.get("unresolved_violations", 0)
+        raw_audit_score = min(100.0, max(0.0, self._number(audit.get("audit_score"), 100.0)))
+        violations = max(0.0, self._number(audit.get("unresolved_violations"), 0.0))
         audit_risk_score = min(100.0, (100.0 - raw_audit_score) * 0.7 + (violations * 15.0))
         
         # Composite Weighted Score
+        weights = {
+            "maintenance": self.w_maintenance,
+            "failures": self.w_failures,
+            "telemetry": self.w_telemetry if telemetry_available else 0.0,
+            "audit": self.w_audit,
+        }
+        weight_total = sum(weights.values())
         composite_score = (
-            (maint_score * self.w_maintenance) +
-            (fail_score * self.w_failures) +
-            (telemetry_score * self.w_telemetry) +
-            (audit_risk_score * self.w_audit)
-        )
+            (maint_score * weights["maintenance"]) +
+            (fail_score * weights["failures"]) +
+            (telemetry_score * weights["telemetry"]) +
+            (audit_risk_score * weights["audit"])
+        ) / weight_total
         
         # Catastrophic Overrides (Fail-safe rule)
         if last_sev == "Catastrophic" or (p_delta > 0.45 and t_delta > 0.35):
@@ -84,9 +106,9 @@ class RiskEngine:
         # Generate Plain-Language Explanations & Contributing Factors
         reasons = []
         if days_since_m > interval:
-            reasons.append(f"Maintenance is overdue by {days_since_m - interval} days (last serviced {days_since_m} days ago).")
+            reasons.append(f"Maintenance is overdue by {days_since_m - interval:g} days (last serviced {days_since_m:g} days ago).")
         if fail_count_90d > 0:
-            reasons.append(f"Recorded {fail_count_90d} failure incidents in the last 90 days (Recent severity: {last_sev}).")
+            reasons.append(f"Recorded {fail_count_90d:g} failure incidents in the last 90 days (Recent severity: {last_sev}).")
         if p_delta > 0.15:
             reasons.append(f"Operating pressure ({p_val:.1f} PSI) is {p_delta * 100:.1f}% above standard baseline ({p_base:.1f} PSI).")
         if t_delta > 0.12:
@@ -94,7 +116,10 @@ class RiskEngine:
         if vib_val > vib_thresh:
             reasons.append(f"Excessive mechanical vibration detected at {vib_val:.1f} mm/s (Safety threshold: {vib_thresh:.1f} mm/s).")
         if violations > 0:
-            reasons.append(f"{violations} open compliance safety citations remain unresolved.")
+            reasons.append(f"{violations:g} open compliance safety citations remain unresolved.")
+
+        if not telemetry_available:
+            reasons.append("Telemetry is incomplete; the score was reweighted toward maintenance, failures, and audit data.")
             
         if not reasons:
             explanation = "Asset operating within nominal safety thresholds across telemetry, audits, and maintenance schedules."
