@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RiskRadar — Explainable Industrial Safety Risk & Early Warning Platform</title>
+  <meta name="description" content="AI-driven industrial safety intelligence. Predict equipment catastrophes before they happen with explainable risk scoring, ranked inspection queues, and tamper-evident audit trails.">
+  <meta name="keywords" content="Industrial Safety, Risk Prediction, Predictive Maintenance, Asset Integrity, IoT Safety, OSHA Compliance, Explainable AI">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="RiskRadar — Explainable Industrial Safety Intelligence">
+  <meta property="og:description" content="Spot patterns that point to safety hazards before accidents happen. AI-driven risk scoring, plain-language explainability, and ranked inspection queues.">
+  <meta property="og:type" content="website">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Background Ambient Glows -->
+  <div class="glow-sphere glow-1"></div>
+  <div class="glow-sphere glow-2"></div>
+  <div class="glow-sphere glow-3"></div>
+
+  <!-- Live Telemetry Announcement Banner -->
+  <div class="live-ticker-bar" id="liveTickerBar">
+    <div class="ticker-content">
+      <span class="ticker-pulse"><span class="dot"></span> LIVE TELEMETRY</span>
+      <span class="ticker-item" id="tickerGas">Gas Compressor COMP-003: <span class="val-warn">892 PSI (+11.5%)</span></span>
+      <span class="ticker-divider">•</span>
+      <span class="ticker-item" id="tickerBoil">Steam Boiler BOIL-004: <span class="val-danger">248°C (+18.1%)</span></span>
+      <span class="ticker-divider">•</span>
+      <span class="ticker-item" id="tickerAudit">Active Fleet Health: <span class="val-good">94.2% Operational</span></span>
+      <span class="ticker-divider">•</span>
+      <span class="ticker-item" id="tickerIncidents">High-Risk Assets In Queue: <span class="val-danger" id="highRiskCountBadge">6 Assets</span></span>
+    </div>
+  </div>
+
+  <!-- Main Navigation -->
+  <header class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#hero" class="nav-brand">
+        <div class="brand-logo">
+          <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">RiskRadar</span>
+          <span class="brand-badge">PS-04</span>
+        </div>
+      </a>
+
+      <nav class="nav-menu" id="navMenu">
+        <a href="#features" class="nav-link"><i class="fa-solid fa-cubes-stacked"></i> Architecture</a>
+        <a href="#simulator" class="nav-link"><i class="fa-solid fa-sliders"></i> Risk Simulator</a>
+        <a href="#inspection-queue" class="nav-link"><i class="fa-solid fa-list-check"></i> Inspection Queue</a>
+        <a href="#audit-log" class="nav-link"><i class="fa-solid fa-fingerprint"></i> Audit Trail</a>
+        <a href="#iot-architecture" class="nav-link"><i class="fa-solid fa-network-wired"></i> IoT Stream</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="https://github.com/ubair-khan/SPIH078" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-sm">
+          <i class="fa-brands fa-github"></i> <span>GitHub Repo</span>
+        </a>
+        <button class="btn btn-primary btn-sm" id="btnLaunchDemo">
+          <i class="fa-solid fa-play"></i> <span>Live Demo</span>
+        </button>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Navigation Menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section" id="hero">
+      <div class="container hero-container">
+        <div class="hero-tag">
+          <span class="tag-sparkle"><i class="fa-solid fa-bolt"></i></span>
+          <span>Industrial Catastrophe Prevention & Explainability AI</span>
+        </div>
+        
+        <h1 class="hero-title">
+          Predict Industrial Hazards <br>
+          <span class="text-gradient">Before Accidents Happen.</span>
+        </h1>
+        
+        <p class="hero-subtitle">
+          Don't wait for disaster post-mortems. RiskRadar analyzes messy maintenance logs, overdue inspections, past failure incidents, and real-time telemetry spikes to synthesize plain-language explanations and ranked inspection directives.
+        </p>
+
+        <div class="hero-cta-group">
+          <a href="#simulator" class="btn btn-primary btn-lg">
+            <i class="fa-solid fa-microchip"></i> Try Live Risk Engine
+          </a>
+          <a href="#inspection-queue" class="btn btn-secondary btn-lg">
+            <i class="fa-solid fa-clipboard-list"></i> View Priority Queue
+          </a>
+          <button class="btn btn-ghost btn-lg" id="btnQuickReport">
+            <i class="fa-solid fa-file-pdf"></i> Export Safety Dossier
+          </button>
+        </div>
+
+        <!-- Metrics Ticker Ribbon -->
+        <div class="hero-metrics-grid">
+          <div class="metric-card">
+            <div class="metric-val text-gradient" id="metricAssetsCount">25</div>
+            <div class="metric-label"><i class="fa-solid fa-gauge-high"></i> Monitored Fleet Assets</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val danger" id="metricHighRisk">6</div>
+            <div class="metric-label"><i class="fa-solid fa-triangle-exclamation"></i> Critical Risks Flagged</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val highlight">100%</div>
+            <div class="metric-label"><i class="fa-solid fa-comment-dots"></i> Plain-Language Explainability</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val success">0 ms</div>
+            <div class="metric-label"><i class="fa-solid fa-stopwatch"></i> Explainable Audit Latency</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Risk Simulator Section (Core Interactive Demo) -->
+    <section class="section simulator-section" id="simulator">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Interactive Sandbox</div>
+          <h2 class="section-title">Test the RiskRadar Scoring & Explanation Engine</h2>
+          <p class="section-desc">Select an industrial asset or tune operating parameters below to watch the deterministic scoring algorithm and plain-language reasoning adapt in real time.</p>
+        </div>
+
+        <div class="simulator-wrapper">
+          <!-- Control Panel -->
+          <div class="sim-card controls-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-sliders"></i> Asset Telemetry & Log Parameters</h3>
+              <div class="preset-dropdown">
+                <label for="assetPresetSelect" class="sr-only">Choose Asset Preset</label>
+                <select id="assetPresetSelect" class="styled-select">
+                  <!-- Populated via JS -->
+                </select>
+              </div>
+            </div>
+
+            <div class="controls-grid">
+              <!-- Slider 1: Days overdue -->
+              <div class="control-group">
+                <div class="control-label-row">
+                  <label for="sliderMaintDays"><i class="fa-regular fa-calendar-xmark"></i> Days Since Last Maintenance</label>
+                  <span class="control-val" id="valMaintDays">210 days</span>
+                </div>
+                <input type="range" id="sliderMaintDays" min="0" max="400" value="210" class="styled-range">
+                <div class="range-subtext">Nominal Service Interval: 90 days</div>
+              </div>
+
+              <!-- Slider 2: Failures in 90d -->
+              <div class="control-group">
+                <div class="control-label-row">
+                  <label for="sliderFailures"><i class="fa-solid fa-burst"></i> Failures (Last 90 Days)</label>
+                  <span class="control-val" id="valFailures">4 incidents</span>
+                </div>
+                <input type="range" id="sliderFailures" min="0" max="8" value="4" class="styled-range">
+                <div class="range-subtext">Recent Incident Severity: <span id="labelSeverity" class="badge-danger">Critical</span></div>
+              </div>
+
+              <!-- Slider 3: Pressure Delta -->
+              <div class="control-group">
+                <div class="control-label-row">
+                  <label for="sliderPressure"><i class="fa-solid fa-gauge"></i> Operating Pressure</label>
+                  <span class="control-val" id="valPressure">920 PSI (+15%)</span>
+                </div>
+                <input type="range" id="sliderPressure" min="50" max="1200" value="920" class="styled-range">
+                <div class="range-subtext">Baseline Threshold: <span id="labelBasePressure">800 PSI</span></div>
+              </div>
+
+              <!-- Slider 4: Temperature Delta -->
+              <div class="control-group">
+                <div class="control-label-row">
+                  <label for="sliderTemp"><i class="fa-solid fa-temperature-arrow-up"></i> Operating Temperature</label>
+                  <span class="control-val" id="valTemp">125°C (+31%)</span>
+                </div>
+                <input type="range" id="sliderTemp" min="20" max="300" value="125" class="styled-range">
+                <div class="range-subtext">Baseline Rating: <span id="labelBaseTemp">95°C</span></div>
+              </div>
+
+              <!-- Slider 5: Vibration -->
+              <div class="control-group">
+                <div class="control-label-row">
+                  <label for="sliderVib"><i class="fa-solid fa-wave-square"></i> Mechanical Vibration</label>
+                  <span class="control-val" id="valVib">8.4 mm/s</span>
+                </div>
+                <input type="range" id="sliderVib" min="0.5" max="15.0" step="0.1" value="8.4" class="styled-range">
+                <div class="range-subtext">Safety Threshold: 5.0 mm/s</div>
+              </div>
+
+              <!-- Slider 6: Safety Audit Score -->
+              <div class="control-group">
+                <div class="control-label-row">
+                  <label for="sliderAudit"><i class="fa-solid fa-clipboard-check"></i> Last Safety Audit Score</label>
+                  <span class="control-val" id="valAudit">48 / 100</span>
+                </div>
+                <input type="range" id="sliderAudit" min="0" max="100" value="48" class="styled-range">
+                <div class="range-subtext">Unresolved Citations: <span id="valViolations">3 open</span></div>
+              </div>
+            </div>
+
+            <div class="controls-actions">
+              <button class="btn btn-outline btn-sm" id="btnSimulateSurge">
+                <i class="fa-solid fa-bolt-lightning"></i> Inject Sudden Thermal Surge
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnResetNominal">
+                <i class="fa-solid fa-rotate-left"></i> Reset to Nominal Safe State
+              </button>
+            </div>
+          </div>
+
+          <!-- Dynamic Output Card -->
+          <div class="sim-card output-card">
+            <div class="card-header">
+              <h3><i class="fa-solid fa-brain"></i> Live Assessment & Reasoning</h3>
+              <div class="live-pill"><span class="pulse-dot"></span> EVALUATING</div>
+            </div>
+
+            <div class="score-display-box">
+              <div class="gauge-container">
+                <svg class="score-gauge" viewBox="0 0 160 160">
+                  <circle class="gauge-bg" cx="80" cy="80" r="68"></circle>
+                  <circle class="gauge-fill" id="gaugeCircle" cx="80" cy="80" r="68"></circle>
+                </svg>
+                <div class="gauge-text-center">
+                  <span class="gauge-score-val" id="displayScore">84.6</span>
+                  <span class="gauge-score-max">/ 100</span>
+                </div>
+              </div>
+
+              <div class="score-summary-details">
+                <div class="risk-badge-box">
+                  <span class="risk-pill high" id="displayRiskBadge">HIGH RISK</span>
+                  <span class="priority-label" id="displayRankLabel">Priority Rank #01</span>
+                </div>
+                <h4 id="displayAssetName">Gas Compressor COMP-003</h4>
+                <div class="location-tag" id="displayAssetLocation"><i class="fa-solid fa-location-dot"></i> Offshore Platform North</div>
+              </div>
+            </div>
+
+            <!-- Weighted Breakdown -->
+            <div class="factor-breakdown">
+              <div class="factor-bar-item">
+                <div class="bar-header">
+                  <span>Maintenance Risk (25%)</span>
+                  <span id="scoreMaint">82%</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar danger" id="barMaint" style="width: 82%"></div></div>
+              </div>
+              <div class="factor-bar-item">
+                <div class="bar-header">
+                  <span>Failure Recurrence Risk (30%)</span>
+                  <span id="scoreFail">95%</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar danger" id="barFail" style="width: 95%"></div></div>
+              </div>
+              <div class="factor-bar-item">
+                <div class="bar-header">
+                  <span>Telemetry Anomaly Delta (30%)</span>
+                  <span id="scoreTelemetry">78%</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar warning" id="barTelemetry" style="width: 78%"></div></div>
+              </div>
+              <div class="factor-bar-item">
+                <div class="bar-header">
+                  <span>Audit Violation Risk (15%)</span>
+                  <span id="scoreAuditFactor">65%</span>
+                </div>
+                <div class="progress-track"><div class="progress-bar warning" id="barAuditFactor" style="width: 65%"></div></div>
+              </div>
+            </div>
+
+            <!-- Plain-Language Explanation -->
+            <div class="explanation-box">
+              <div class="explanation-title">
+                <i class="fa-solid fa-comment-nodes"></i> Plain-Language Safety Explanation
+              </div>
+              <p class="explanation-text" id="displayExplanation">
+                Maintenance is overdue by 120 days. Recorded 4 failure incidents in the last 90 days (Recent severity: Critical). Operating pressure (920 PSI) is 15.0% above standard baseline. Thermal reading (125°C) is 31.6% elevated. Excessive mechanical vibration detected at 8.4 mm/s.
+              </p>
+            </div>
+
+            <!-- Recommended Action -->
+            <div class="action-box">
+              <div class="action-title"><i class="fa-solid fa-person-digging"></i> Recommended Action Protocol</div>
+              <p class="action-text" id="displayAction">
+                EMERGENCY: Immediate safety shutdown and comprehensive physical inspection required.
+              </p>
+            </div>
+
+            <div class="output-footer-actions">
+              <button class="btn btn-primary btn-sm" id="btnLogToAudit">
+                <i class="fa-solid fa-shield-cat"></i> Commit to Tamper-Evident Audit Log
+              </button>
+              <button class="btn btn-secondary btn-sm" id="btnInspectDossier">
+                <i class="fa-solid fa-file-invoice"></i> View Full Asset Dossier
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Produx Bento Grid Architecture & Capabilities -->
+    <section class="section bento-section" id="features">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge"><i class="fa-solid fa-cubes"></i> Core System Pillars</div>
+          <h2 class="section-title">Built for Real-World Industrial Resilience</h2>
+          <p class="section-desc">Safety teams cannot act on black-box predictions. RiskRadar delivers explainability, prioritization, and verifiable auditability.</p>
+        </div>
+
+        <div class="bento-grid">
+          <!-- Bento 1: Explainability -->
+          <div class="bento-card bento-large">
+            <div class="bento-content">
+              <div class="bento-icon"><i class="fa-solid fa-comments"></i></div>
+              <h3>Plain-Language Explainability</h3>
+              <p>A red flag alone does not help an inspector. RiskRadar unpacks every risk score into intuitive, natural language root causes: explaining exact maintenance delays, failure patterns, and sensor drift.</p>
+              <div class="mock-quote-box">
+                <code>"Asset is 120 days overdue for overhaul, logged 4 critical failure incidents, and temperature is 31.6% above safe baseline."</code>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bento 2: Ranked Priority Queue -->
+          <div class="bento-card">
+            <div class="bento-icon highlight"><i class="fa-solid fa-arrow-down-short-wide"></i></div>
+            <h3>Inspection Priority Ranking</h3>
+            <p>Inspectors have limited time and cannot visit every plant asset at once. The engine sorts assets by true catastrophic risk, dispatching teams to the most hazardous locations first.</p>
+          </div>
+
+          <!-- Bento 3: Actionable Directives -->
+          <div class="bento-card">
+            <div class="bento-icon success"><i class="fa-solid fa-compass-drafting"></i></div>
+            <h3>Actionable Directives</h3>
+            <p>Every alert includes a definitive resolution protocol: immediate shutdown, high-priority overhaul, preventative calibration, or targeted telemetry monitoring.</p>
+          </div>
+
+          <!-- Bento 4: Messy Data Resilience -->
+          <div class="bento-card">
+            <div class="bento-icon warning"><i class="fa-solid fa-database"></i></div>
+            <h3>Messy Data Resilience</h3>
+            <p>Industrial records are incomplete, inconsistent, and unstructured. Our ingestion layer gracefully normalizes missing timestamps, null readings, and varied equipment ontologies.</p>
+          </div>
+
+          <!-- Bento 5: Tamper-Evident Audit Trail -->
+          <div class="bento-card bento-wide">
+            <div class="bento-content">
+              <div class="bento-icon"><i class="fa-solid fa-fingerprint"></i></div>
+              <h3>Tamper-Evident Safety Audit Trail</h3>
+              <p>Trust requires a trail. When life-critical decisions are made, every sensor snapshot, rule firing, and score calculation is permanently archived with UTC timestamps for OSHA & ISO 45001 audits.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Priority Inspection Queue Section -->
+    <section class="section queue-section" id="inspection-queue">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge"><i class="fa-solid fa-list-check"></i> Field Operations</div>
+          <h2 class="section-title">Ranked Asset Inspection Queue</h2>
+          <p class="section-desc">Live priority queue sorted by severity. Click any asset to inspect telemetry history, maintenance delinquencies, and safety audit logs.</p>
+        </div>
+
+        <div class="queue-toolbar">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="queueSearchInput" placeholder="Search by Asset ID (e.g. BOIL-004), Type, or Location...">
+          </div>
+          <div class="filter-pills" id="filterPills">
+            <button class="filter-btn active" data-filter="ALL">All Assets (<span id="countAll">25</span>)</button>
+            <button class="filter-btn" data-filter="High"><span class="badge-dot danger"></span> High Risk (<span id="countHigh">6</span>)</button>
+            <button class="filter-btn" data-filter="Medium"><span class="badge-dot warning"></span> Medium Risk (<span id="countMed">9</span>)</button>
+            <button class="filter-btn" data-filter="Low"><span class="badge-dot success"></span> Low Risk (<span id="countLow">10</span>)</button>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="styled-table" id="inspectionTable">
+            <thead>
+              <tr>
+                <th>Priority</th>
+                <th>Asset ID / Name</th>
+                <th>Location</th>
+                <th>Risk Score</th>
+                <th>Status / Severity</th>
+                <th>Primary Risk Driver</th>
+                <th>Recommended Action</th>
+                <th>Inspect</th>
+              </tr>
+            </thead>
+            <tbody id="queueTableBody">
+              <!-- Populated dynamically via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tamper-Evident Audit Trail Section -->
+    <section class="section audit-section" id="audit-log">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge"><i class="fa-solid fa-shield-halved"></i> Compliance & Governance</div>
+          <h2 class="section-title">Tamper-Evident Audit Trail Log</h2>
+          <p class="section-desc">Immutable log capturing the exact data snapshot, rule evaluation, and reasoning behind every decision.</p>
+        </div>
+
+        <div class="audit-card">
+          <div class="audit-card-header">
+            <div class="audit-header-left">
+              <span class="audit-title"><i class="fa-solid fa-terminal"></i> Safety Decision Ledger (.tmp/audit_log.jsonl)</span>
+              <span class="audit-count" id="auditLogCountBadge">25 Logged Entries</span>
+            </div>
+            <div class="audit-actions">
+              <button class="btn btn-secondary btn-sm" id="btnExportAuditJson">
+                <i class="fa-solid fa-download"></i> Export JSONL
+              </button>
+              <button class="btn btn-ghost btn-sm" id="btnClearSimLogs">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh Log
+              </button>
+            </div>
+          </div>
+
+          <div class="audit-stream" id="auditLogStream">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- IoT Streaming Integration Architecture (Bonus Section) -->
+    <section class="section iot-section" id="iot-architecture">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-badge"><i class="fa-solid fa-network-wired"></i> Architecture Note</div>
+          <h2 class="section-title">Live IoT Sensor Streaming & Early-Warning Design</h2>
+          <p class="section-desc">How RiskRadar scales from batch logs to millions of real-time MQTT, OPC-UA, and Kafka telemetry events per second.</p>
+        </div>
+
+        <div class="iot-architecture-container">
+          <div class="iot-pipeline-diagram">
+            <div class="pipeline-step">
+              <div class="step-num">01</div>
+              <div class="step-icon"><i class="fa-solid fa-microchip"></i></div>
+              <h4>Edge Sensors</h4>
+              <p>OPC-UA, Modbus, MQTT telemetry at 100Hz from pumps, boilers, and reactors.</p>
+            </div>
+            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
+            
+            <div class="pipeline-step">
+              <div class="step-num">02</div>
+              <div class="step-icon"><i class="fa-solid fa-server"></i></div>
+              <h4>Stream Worker</h4>
+              <p>Apache Flink / Kafka calculating 5-min rolling EMAs and dynamic baseline drift.</p>
+            </div>
+            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
+
+            <div class="pipeline-step active-step">
+              <div class="step-num">03</div>
+              <div class="step-icon"><i class="fa-solid fa-brain"></i></div>
+              <h4>RiskRadar Engine</h4>
+              <p>Deterministic re-scoring & stateful early warning transition detection.</p>
+            </div>
+            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
+
+            <div class="pipeline-step">
+              <div class="step-num">04</div>
+              <div class="step-icon"><i class="fa-solid fa-tower-broadcast"></i></div>
+              <h4>Instant Dispatch</h4>
+              <p>Sub-second webhook & WebSocket alerts to floor inspectors' rugged tablets.</p>
+            </div>
+          </div>
+
+          <div class="iot-spec-card">
+            <h3><i class="fa-solid fa-code"></i> Python Streaming Integration Reference</h3>
+            <pre><code># execution/stream_subscriber.py
+from risk_engine import RiskEngine
+from audit_trail import AuditLogger
+
+def on_telemetry_packet(event):
+    # Stateful transition check: Low -> Medium or Medium -> High
+    previous_score = state_store.get(event['asset_id'])
+    assessment = RiskEngine().evaluate_asset(event)
+    
+    if assessment['risk_score'] > previous_score + 15.0:
+        dispatch_early_warning(assessment)
+    
+    AuditLogger().log_assessment(event, assessment)</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Asset Detail Dossier Modal -->
+  <div class="modal-backdrop" id="assetModalBackdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-badge" id="modalRiskBadge">HIGH RISK</span>
+          <h3 id="modalAssetTitle">Asset Dossier: COMP-003</h3>
+        </div>
+        <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+      </div>
+
+      <div class="modal-body" id="modalBodyContent">
+        <!-- Filled dynamically -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalCopyJsonBtn"><i class="fa-regular fa-copy"></i> Copy Raw JSON</button>
+        <button class="btn btn-primary" id="modalLoadToSimBtn"><i class="fa-solid fa-sliders"></i> Load into Simulator</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Safety Dossier Report Modal / Drawer -->
+  <div class="modal-backdrop" id="reportModalBackdrop">
+    <div class="modal-dialog report-dialog">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-badge success">EXECUTIVE DOSSIER</span>
+          <h3>Plant Safety Audit & Inspection Summary</h3>
+        </div>
+        <button class="modal-close-btn" id="reportModalCloseBtn">&times;</button>
+      </div>
+
+      <div class="modal-body report-body" id="reportBodyContent">
+        <!-- Populated via JS -->
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btnPrintReportBtn"><i class="fa-solid fa-print"></i> Print / Save PDF</button>
+        <button class="btn btn-primary" id="btnDownloadReportMd"><i class="fa-solid fa-file-arrow-down"></i> Download Markdown</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-brand-col">
+        <div class="brand-logo"><i class="fa-solid fa-shield-halved"></i></div>
+        <span class="brand-name">RiskRadar</span>
+        <p class="footer-desc">
+          Explainable industrial safety risk intelligence. Built for PS-04 Problem Statement to prevent catastrophic workplace failures.
+        </p>
+      </div>
+
+      <div class="footer-links-col">
+        <h4>Navigation</h4>
+        <a href="#hero">Overview</a>
+        <a href="#simulator">Risk Engine Sandbox</a>
+        <a href="#inspection-queue">Inspection Queue</a>
+        <a href="#audit-log">Audit Trail</a>
+        <a href="#iot-architecture">IoT Streaming Note</a>
+      </div>
+
+      <div class="footer-links-col">
+        <h4>Standards & Code</h4>
+        <a href="https://github.com/ubair-khan/SPIH078" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i> GitHub Repository</a>
+        <a href="directives/risk_radar_pipeline.md"><i class="fa-solid fa-book"></i> SOP Directives</a>
+        <a href="execution/risk_engine.py"><i class="fa-solid fa-code"></i> Python Engine</a>
+        <span>ISO 45001 & OSHA Compliant</span>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <div class="container footer-bottom-flex">
+        <span>© 2026 RiskRadar • Industrial AI Safety Systems</span>
+        <span>Repository: <a href="https://github.com/ubair-khan/SPIH078.git" target="_blank" rel="noopener noreferrer">github.com/ubair-khan/SPIH078</a></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
