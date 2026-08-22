@@ -370,6 +370,14 @@ let currentEvaluations = engine.evaluateAll(MOCK_ASSETS);
 let currentSimAsset = { ...MOCK_ASSETS[0] };
 let auditLogEntries = [];
 
+// 3b. Live Sync (execution/api_server.py) — real-time WebSocket data feed.
+// Falls back to the local mock engine above whenever the API isn't reachable.
+const RISKPULSE_API_BASE = window.RISKPULSE_API_BASE || "http://127.0.0.1:8787";
+const RISKPULSE_WS_URL = RISKPULSE_API_BASE.replace(/^http/, "ws") + "/ws/live";
+let liveSocket = null;
+let liveReconnectTimer = null;
+let fakeTickerInterval = null;
+
 function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, character => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
@@ -740,6 +748,139 @@ function closeReportModal() {
   document.getElementById("reportModalBackdrop").classList.remove("active");
 }
 
+// 8b. Live Sync Wiring
+function setLiveStatus(connected) {
+  const dot = document.getElementById("wsStatusDot");
+  const label = document.getElementById("wsStatusLabel");
+  if (dot) dot.classList.toggle("offline", !connected);
+  if (label) label.textContent = connected ? "Live" : "Reconnecting…";
+}
+
+function startFakeTicker() {
+  if (fakeTickerInterval) return;
+  fakeTickerInterval = setInterval(() => {
+    const gas = document.getElementById("tickerGas");
+    const boil = document.getElementById("tickerBoil");
+    if (gas) {
+      const p = (890 + Math.random() * 8).toFixed(1);
+      gas.innerHTML = `COMP-003 Pressure: <strong class="t-warn">${p} PSI (+11.8%)</strong>`;
+    }
+    if (boil) {
+      const t = (247 + Math.random() * 4).toFixed(1);
+      boil.innerHTML = `BOIL-004 Temp: <strong class="t-danger">${t}°C (+18.4%)</strong>`;
+    }
+  }, 3500);
+}
+
+function stopFakeTicker() {
+  if (fakeTickerInterval) {
+    clearInterval(fakeTickerInterval);
+    fakeTickerInterval = null;
+  }
+}
+
+function applyLiveEvaluations(newEvaluations) {
+  currentEvaluations = newEvaluations;
+  renderHeroMetrics();
+  const activeFilter = document.querySelector(".filter-btn.active")?.getAttribute("data-filter") || "ALL";
+  renderQueueTable(activeFilter, document.getElementById("queueSearchInput").value);
+}
+
+function renderLiveTickerFromChanges(changes) {
+  if (!changes || changes.length === 0) return;
+  stopFakeTicker();
+  const gas = document.getElementById("tickerGas");
+  const boil = document.getElementById("tickerBoil");
+  const cls = (level) => level === "High" ? "t-danger" : (level === "Medium" ? "t-warn" : "t-good");
+  const fmt = (n) => (typeof n === "number" ? n.toFixed(1) : n);
+
+  if (gas && changes[0]) {
+    const c = changes[0];
+    gas.innerHTML = `${escapeHtml(c.asset_id)} Pressure: <strong class="${cls(c.risk_level)}">${fmt(c.pressure_psi)} PSI</strong>`;
+  }
+  if (boil) {
+    const c = changes[1] || changes[0];
+    if (c) {
+      boil.innerHTML = `${escapeHtml(c.asset_id)} Temp: <strong class="${cls(c.risk_level)}">${fmt(c.temperature_c)}°C</strong>`;
+    }
+  }
+}
+
+async function fetchAuditLogFromServer() {
+  try {
+    const res = await fetch(`${RISKPULSE_API_BASE}/api/audit-log?limit=30`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (Array.isArray(data.entries) && data.entries.length > 0) {
+      auditLogEntries = data.entries.map(e => ({
+        timestamp: e.timestamp,
+        asset_id: e.asset_id,
+        asset_type: e.asset_type,
+        location: e.location,
+        priority_rank: e.priority_rank,
+        risk_score: e.risk_score,
+        risk_level: e.risk_level,
+        decision_factors: e.decision_factors,
+        component_breakdown: e.component_breakdown,
+        recommended_action: e.recommended_action,
+        raw_snapshot: e.raw_input_snapshot
+      }));
+      renderAuditLog();
+    }
+  } catch (err) {
+    // API offline — keep the locally seeded audit log.
+  }
+}
+
+function connectLiveSync() {
+  let socket;
+  try {
+    socket = new WebSocket(RISKPULSE_WS_URL);
+  } catch (err) {
+    startFakeTicker();
+    return;
+  }
+  liveSocket = socket;
+
+  socket.onopen = () => {
+    setLiveStatus(true);
+    if (liveReconnectTimer) {
+      clearTimeout(liveReconnectTimer);
+      liveReconnectTimer = null;
+    }
+    fetchAuditLogFromServer();
+  };
+
+  socket.onmessage = (event) => {
+    let msg;
+    try {
+      msg = JSON.parse(event.data);
+    } catch (err) {
+      return;
+    }
+    if ((msg.type === "snapshot" || msg.type === "update") && Array.isArray(msg.evaluations) && msg.evaluations.length > 0) {
+      applyLiveEvaluations(msg.evaluations);
+    }
+    if (msg.type === "update") {
+      renderLiveTickerFromChanges(msg.changed);
+      if ((msg.changed || []).some(c => c.risk_level_changed)) {
+        fetchAuditLogFromServer();
+      }
+    }
+  };
+
+  socket.onclose = () => {
+    setLiveStatus(false);
+    startFakeTicker();
+    liveSocket = null;
+    liveReconnectTimer = setTimeout(connectLiveSync, 5000);
+  };
+
+  socket.onerror = () => {
+    socket.close();
+  };
+}
+
 // 9. Event Listeners & Bootstrapping
 document.addEventListener("DOMContentLoaded", () => {
   initAuditLog();
@@ -906,17 +1047,9 @@ document.addEventListener("DOMContentLoaded", () => {
     URL.revokeObjectURL(url);
   });
 
-  // Live Sensor Ticker Subtle Updates
-  setInterval(() => {
-    const gas = document.getElementById("tickerGas");
-    const boil = document.getElementById("tickerBoil");
-    if (gas) {
-      const p = (890 + Math.random() * 8).toFixed(1);
-      gas.innerHTML = `COMP-003 Pressure: <strong class="t-warn">${p} PSI (+11.8%)</strong>`;
-    }
-    if (boil) {
-      const t = (247 + Math.random() * 4).toFixed(1);
-      boil.innerHTML = `BOIL-004 Temp: <strong class="t-danger">${t}°C (+18.4%)</strong>`;
-    }
-  }, 3500);
+  // Live Sensor Ticker: try the real-time API/WebSocket feed first, falling back
+  // to a locally simulated ticker whenever execution/api_server.py isn't running.
+  setLiveStatus(false);
+  startFakeTicker();
+  connectLiveSync();
 });

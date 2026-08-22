@@ -293,6 +293,11 @@ h1, h2, h3, h4, h5 {
   flex-shrink: 0;
 }
 
+.live-dot.offline {
+  background: var(--text-meta);
+  animation: none;
+}
+
 .ticker-sep {
   color: var(--gray-200);
   flex-shrink: 0;

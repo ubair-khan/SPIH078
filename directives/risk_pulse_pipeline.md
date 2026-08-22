@@ -45,6 +45,13 @@ Inputs are processed from intermediate storage in `.tmp/` or designated data fil
   - Emits tamper-evident timestamped audit log entries (`.tmp/audit_log.jsonl`) capturing raw factors, rule outcomes, scores, and decision rationale.
   - Summarizes plant-wide risk distribution and high-priority inspection queue.
 
+### Step 4 (optional): Continuous Live Mode
+- **Tool**: `execution/api_server.py` — see `directives/realtime_sync_automation.md`.
+- Runs Steps 1–3 continuously on a timer instead of a single manual invocation, and
+  pushes updates to the dashboard over WebSocket as they happen. Use this instead of a
+  one-off `run_pipeline.py` run whenever the dashboard needs to reflect live/streaming
+  sensor conditions.
+
 ---
 
 ## 4. Deliverables & Outputs

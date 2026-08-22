@@ -26,7 +26,8 @@
 - **Layer 1: Directive (`directives/`)**
   - Standard Operating Procedures (SOPs) written in Markdown.
   - [directives/risk_pulse_pipeline.md](directives/risk_pulse_pipeline.md)
-  - [directives/iot_integration_architecture.md](directives/iot_integration_architecture.md)
+  - [directives/realtime_sync_automation.md](directives/realtime_sync_automation.md)
+  - [directives/iot_integration_architecture.md](directives/iot_integration_architecture.md) — future production-scale target.
 
 - **Layer 2: Orchestration**
   - Decision-making layer routing workflows and executing tools deterministically.
@@ -35,7 +36,8 @@
   - [execution/generate_mock_data.py](execution/generate_mock_data.py) — Realistic industrial dataset generator.
   - [execution/risk_engine.py](execution/risk_engine.py) — Deterministic risk calculation and explanation engine.
   - [execution/audit_trail.py](execution/audit_trail.py) — Tamper-evident audit logger.
-  - [execution/run_pipeline.py](execution/run_pipeline.py) — End-to-end pipeline runner.
+  - [execution/run_pipeline.py](execution/run_pipeline.py) — End-to-end batch pipeline runner.
+  - [execution/api_server.py](execution/api_server.py) — Live sync API: simulates streaming telemetry, rescoring continuously and pushing updates to the dashboard over WebSocket.
 
 ---
 
@@ -50,7 +52,7 @@ npx serve .
 python -m http.server 8000
 ```
 
-### 2. Run the Python Pipeline
+### 2. Run the Python Pipeline (one-off batch scoring)
 ```bash
 python execution/run_pipeline.py
 ```
@@ -59,6 +61,29 @@ Outputs will be generated in `.tmp/`:
 - `.tmp/raw_assets_data.json` — Ingested asset dataset.
 - `.tmp/risk_assessment_results.json` — Scored and ranked assessments.
 - `.tmp/audit_log.jsonl` — Immutable audit trail entries.
+
+### 3. Run the Live Sync API (real-time automation)
+The API wraps the same risk engine but keeps running: on an interval it drifts sensor
+telemetry (standing in for a live feed), rescoring the fleet, logging any risk-level
+transitions to the audit trail, and pushing updates to the dashboard over WebSocket.
+See [directives/realtime_sync_automation.md](directives/realtime_sync_automation.md) for the full design.
+
+```bash
+pip install -r requirements.txt
+uvicorn execution.api_server:app --reload --port 8787
+```
+
+Then open `index.html` as usual — it connects to `ws://127.0.0.1:8787/ws/live`
+automatically and falls back to the static demo data if the API isn't running.
+
+Key endpoints:
+- `GET /api/assets` — current ranked risk assessments
+- `GET /api/audit-log?limit=50` — recent audit trail entries
+- `POST /api/refresh` — force an immediate sync tick
+- `POST /api/simulate-surge/{asset_id}` — inject a surge on a specific asset for demos
+- `WS /ws/live` — live evaluation snapshots/updates
+
+Configurable via `.env`: `SYNC_INTERVAL_SECONDS` (default `5`), `RISKPULSE_DATA_FILE`, `RISKPULSE_AUDIT_LOG`.
 
 ---
 

@@ -1,5 +1,11 @@
 # Architecture Design Note: Live IoT Sensor Data Integration
 
+> **Status**: production-scale target. For what's actually implemented and running
+> today, see [directives/realtime_sync_automation.md](realtime_sync_automation.md)
+> (`execution/api_server.py`) — a lightweight FastAPI + WebSocket sync loop with no
+> extra infrastructure. Grow into this document's Kafka/MQTT/Flink design only once
+> real high-throughput sensor ingestion is actually needed.
+
 ## 1. Overview
 This design note outlines how the RiskPulse scoring and explanation engine plugs into live industrial IoT sensor streams (MQTT, OPC-UA, Kafka, AWS IoT Core) for sub-second anomaly detection and continuous safety re-scoring.
 
