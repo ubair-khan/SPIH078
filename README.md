@@ -1,11 +1,11 @@
-# RiskRadar — Explainable Industrial Safety Intelligence
+# RiskPulse — Explainable Industrial Safety Intelligence
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Compliance](https://img.shields.io/badge/Compliance-OSHA%20%7C%20ISO%2045001-green.svg)](#)
 [![Architecture](https://img.shields.io/badge/System-3--Layer%20Architecture-indigo.svg)](#)
 
 > **Predict Industrial Catastrophes Before Accidents Happen.**  
-> RiskRadar studies historical maintenance records, equipment failure logs, inspection reports, safety audits, and operational sensor readings (pressure, temperature, vibration) to spot patterns pointing to safety hazards before accidents occur.
+> RiskPulse studies historical maintenance records, equipment failure logs, inspection reports, safety audits, and operational sensor readings (pressure, temperature, vibration) to spot patterns pointing to safety hazards before accidents occur.
 
 ---
 
@@ -25,7 +25,7 @@
 
 - **Layer 1: Directive (`directives/`)**
   - Standard Operating Procedures (SOPs) written in Markdown.
-  - [directives/risk_radar_pipeline.md](directives/risk_radar_pipeline.md)
+  - [directives/risk_pulse_pipeline.md](directives/risk_pulse_pipeline.md)
   - [directives/iot_integration_architecture.md](directives/iot_integration_architecture.md)
 
 - **Layer 2: Orchestration**

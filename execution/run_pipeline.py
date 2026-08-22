@@ -1,6 +1,6 @@
 """
 run_pipeline.py
-Main orchestration runner for RiskRadar.
+Main orchestration runner for RiskPulse.
 Ingests asset data -> Scores & ranks risks -> Generates plain-language reasons & recommendations
 -> Emits audit log -> Saves results to .tmp/ and prints formatted executive summary.
 """
@@ -14,9 +14,9 @@ from generate_mock_data import generate_assets_dataset
 from risk_engine import RiskEngine
 from audit_trail import AuditLogger
 
-def run_riskradar_pipeline(data_file: str = ".tmp/raw_assets_data.json", results_file: str = ".tmp/risk_assessment_results.json"):
+def run_riskpulse_pipeline(data_file: str = ".tmp/raw_assets_data.json", results_file: str = ".tmp/risk_assessment_results.json"):
     print("=" * 70)
-    print("  RISKRADAR: Industrial Safety Risk Prediction & Audit System")
+    print("  RISKPULSE: Industrial Safety Risk Prediction & Audit System")
     print("=" * 70)
     
     # 1. Ensure Data Ingestion
@@ -70,4 +70,4 @@ def run_riskradar_pipeline(data_file: str = ".tmp/raw_assets_data.json", results
     return evaluations
 
 if __name__ == "__main__":
-    run_riskradar_pipeline()
+    run_riskpulse_pipeline()

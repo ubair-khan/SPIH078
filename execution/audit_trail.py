@@ -1,6 +1,6 @@
 """
 audit_trail.py
-Audit logging facility ensuring every RiskRadar recommendation and assessment
+Audit logging facility ensuring every RiskPulse recommendation and assessment
 has a traceable, tamper-evident log entry recording input metrics and reasoning.
 """
 

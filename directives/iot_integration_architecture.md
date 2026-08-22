@@ -1,7 +1,7 @@
 # Architecture Design Note: Live IoT Sensor Data Integration
 
 ## 1. Overview
-This design note outlines how the RiskRadar scoring and explanation engine plugs into live industrial IoT sensor streams (MQTT, OPC-UA, Kafka, AWS IoT Core) for sub-second anomaly detection and continuous safety re-scoring.
+This design note outlines how the RiskPulse scoring and explanation engine plugs into live industrial IoT sensor streams (MQTT, OPC-UA, Kafka, AWS IoT Core) for sub-second anomaly detection and continuous safety re-scoring.
 
 ---
 

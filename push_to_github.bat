@@ -1,6 +1,6 @@
 @echo off
 echo =========================================================
-echo Pushing RiskRadar code to https://github.com/ubair-khan/SPIH078.git
+echo Pushing RiskPulse code to https://github.com/ubair-khan/SPIH078.git
 echo =========================================================
 .tmp\mingit\cmd\git.exe push -u origin main
 if %ERRORLEVEL% NEQ 0 (

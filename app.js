@@ -1,5 +1,5 @@
 /**
- * RiskRadar — Interactive Client Logic & Mock Data Engine
+ * RiskPulse — Interactive Client Logic & Mock Data Engine
  * Features:
  * - 25+ pre-loaded industrial assets with realistic telemetry and historical logs
  * - Client-side deterministic Risk Engine implementation matching Layer 3 python spec
@@ -826,7 +826,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `riskradar_audit_log_${new Date().toISOString().substring(0, 10)}.jsonl`;
+    a.download = `riskpulse_audit_log_${new Date().toISOString().substring(0, 10)}.jsonl`;
     a.click();
     URL.revokeObjectURL(url);
   });
@@ -855,7 +855,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.getElementById("btnDownloadReportMd").addEventListener("click", () => {
-    let md = `# RiskRadar Executive Industrial Safety Report\nGenerated: ${new Date().toUTCString()}\n\n`;
+    let md = `# RiskPulse Executive Industrial Safety Report\nGenerated: ${new Date().toUTCString()}\n\n`;
     currentEvaluations.forEach(e => {
       md += `### #${e.priority_rank} [${e.risk_level.toUpperCase()}] ${e.asset_id} — ${e.asset_type}\n`;
       md += `- **Score**: ${e.risk_score}/100\n`;
@@ -867,7 +867,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `RiskRadar_Inspection_Report_${new Date().toISOString().substring(0, 10)}.md`;
+    a.download = `RiskPulse_Inspection_Report_${new Date().toISOString().substring(0, 10)}.md`;
     a.click();
     URL.revokeObjectURL(url);
   });

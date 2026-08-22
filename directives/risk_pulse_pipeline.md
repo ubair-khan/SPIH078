@@ -1,7 +1,7 @@
-# Directive: RiskRadar Industrial Risk Assessment Pipeline
+# Directive: RiskPulse Industrial Risk Assessment Pipeline
 
 ## 1. Objective & Scope
-The goal of RiskRadar is to evaluate industrial assets (equipment, processes, facilities) by analyzing historical maintenance logs, failure reports, inspection audits, and operating sensor telemetry (temperature, pressure, vibration). It flags potential hazards **before** incidents occur, explains the rationale in plain language, assigns actionable recommendations, and outputs a prioritized inspection queue with a verifiable audit trail.
+The goal of RiskPulse is to evaluate industrial assets (equipment, processes, facilities) by analyzing historical maintenance logs, failure reports, inspection audits, and operating sensor telemetry (temperature, pressure, vibration). It flags potential hazards **before** incidents occur, explains the rationale in plain language, assigns actionable recommendations, and outputs a prioritized inspection queue with a verifiable audit trail.
 
 ---
 

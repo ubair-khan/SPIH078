@@ -1,6 +1,6 @@
 """
 risk_engine.py
-Core deterministic calculation and explainability engine for RiskRadar.
+Core deterministic calculation and explainability engine for RiskPulse.
 Evaluates historical maintenance, failure logs, safety audits, and sensor metrics
 to compute risk score, category, plain-language explanations, and recommended actions.
 """
