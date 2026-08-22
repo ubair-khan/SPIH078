@@ -87,5 +87,30 @@ Configurable via `.env`: `SYNC_INTERVAL_SECONDS` (default `5`), `RISKPULSE_DATA_
 
 ---
 
+## 💰 Pricing & Cost
+
+B2B SaaS, priced per monitored asset per month. Because the scoring engine is deterministic
+(rule-based, not ML), the cost to serve each asset is just compute + hosting — no training
+or inference cost — which keeps gross margin high even at the entry tier.
+
+| Tier | Price | Includes |
+|---|---|---|
+| **Starter** | $15 / asset / month | Batch scoring only, up to 50 assets, single site |
+| **Pro** | $35 / asset / month | + Live telemetry sync, WebSocket dashboard, unlimited inspectors, audit log export |
+| **Enterprise** | Custom (~$50+ / asset / month) | + Multi-site fleet view, SSO, OSHA/ISO 45001 compliance reporting, SLA support |
+
+**One-time implementation fee** ($15k–$75k, scoped per plant): integrating RiskPulse with a
+site's real SCADA/IoT sensor feeds, replacing the simulated telemetry drift in
+[execution/api_server.py](execution/api_server.py) with live feeds per
+[directives/iot_integration_architecture.md](directives/iot_integration_architecture.md).
+
+**Cost to run**: a single small FastAPI instance can score and stream updates for a full
+plant's asset fleet — estimated infra cost is well under $1/asset/month at scale, so gross
+margin stays roughly 90%+ across all tiers.
+
+*Note: this pricing is a proposed business model for pitching purposes, not a billed product yet.*
+
+---
+
 ## 📊 Repository
 - **GitHub Repository**: [https://github.com/ubair-khan/SPIH078.git](https://github.com/ubair-khan/SPIH078.git)
