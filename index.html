@@ -82,6 +82,7 @@
         <a href="#inspection-queue" class="nav-link"><i class="fa-solid fa-list-check"></i> Queue</a>
         <a href="#audit-log" class="nav-link"><i class="fa-solid fa-fingerprint"></i> Audit</a>
         <a href="#iot-architecture" class="nav-link"><i class="fa-solid fa-network-wired"></i> IoT</a>
+        <a href="#pricing" class="nav-link"><i class="fa-solid fa-tags"></i> Pricing</a>
       </nav>
 
       <div class="nav-actions">
@@ -643,6 +644,72 @@ def on_telemetry_packet(event):
       </div>
     </section>
 
+    <!-- ================================================================
+         PRICING
+         ================================================================ -->
+    <section class="section pricing-section" id="pricing">
+      <div class="container">
+
+        <div class="section-head">
+          <span class="section-num mono">007</span>
+          <div class="section-head-content">
+            <div class="section-label">Business Model</div>
+            <h2 class="section-title">Pricing &amp;<br>Cost to Serve.</h2>
+            <p class="section-desc">Per-asset SaaS pricing. Because scoring is deterministic — not machine-learned —
+              the cost to serve each asset is just compute and hosting, keeping margin high at every tier.</p>
+          </div>
+        </div>
+
+        <div class="pricing-grid">
+
+          <div class="pricing-card">
+            <div class="pricing-tier">Starter</div>
+            <div class="pricing-price">$15<span>/ asset / mo</span></div>
+            <p class="pricing-desc">Batch scoring for smaller sites getting started.</p>
+            <ul class="pricing-features">
+              <li><i class="fa-solid fa-check"></i> Up to 50 assets, single site</li>
+              <li><i class="fa-solid fa-check"></i> Batch risk scoring &amp; ranked queue</li>
+              <li><i class="fa-solid fa-check"></i> Plain-language explanations</li>
+            </ul>
+          </div>
+
+          <div class="pricing-card featured">
+            <div class="pricing-badge">Most Common</div>
+            <div class="pricing-tier">Pro</div>
+            <div class="pricing-price">$35<span>/ asset / mo</span></div>
+            <p class="pricing-desc">Live telemetry sync for active safety operations.</p>
+            <ul class="pricing-features">
+              <li><i class="fa-solid fa-check"></i> Everything in Starter</li>
+              <li><i class="fa-solid fa-check"></i> Live WebSocket dashboard &amp; sync</li>
+              <li><i class="fa-solid fa-check"></i> Unlimited inspectors</li>
+              <li><i class="fa-solid fa-check"></i> Tamper-evident audit export</li>
+            </ul>
+          </div>
+
+          <div class="pricing-card">
+            <div class="pricing-tier">Enterprise</div>
+            <div class="pricing-price">Custom</div>
+            <p class="pricing-desc">Multi-site fleets with compliance &amp; SLA needs.</p>
+            <ul class="pricing-features">
+              <li><i class="fa-solid fa-check"></i> Everything in Pro</li>
+              <li><i class="fa-solid fa-check"></i> Multi-site fleet view &amp; SSO</li>
+              <li><i class="fa-solid fa-check"></i> OSHA &amp; ISO 45001 compliance reporting</li>
+              <li><i class="fa-solid fa-check"></i> SLA-backed support</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <div class="pricing-note">
+          <i class="fa-solid fa-circle-info"></i>
+          <span>One-time implementation fee ($15k&ndash;$75k, scoped per plant) covers integrating live SCADA/IoT
+            sensor feeds in place of simulated telemetry. Deterministic scoring keeps infra cost under $1 / asset /
+            month, so gross margin stays roughly 90%+ across every tier.</span>
+        </div>
+
+      </div>
+    </section>
+
   </main>
 
   <!-- ================================================================
@@ -666,6 +733,7 @@ def on_telemetry_packet(event):
           <a href="#inspection-queue">Inspection Queue</a>
           <a href="#audit-log">Audit Trail</a>
           <a href="#iot-architecture">IoT Streaming</a>
+          <a href="#pricing">Pricing</a>
         </div>
         <div class="footer-col">
           <h5>Standards &amp; Code</h5>
