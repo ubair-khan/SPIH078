@@ -315,8 +315,8 @@ class ClientRiskEngine {
       reasons.push(`${violations} open safety compliance violation(s) remain unresolved.`);
     }
 
-    const explanation = reasons.length > 0 
-      ? reasons.join(" ") 
+    const explanation = reasons.length > 0
+      ? reasons.join(" ")
       : "Operating within normal safe limits across telemetry, maintenance schedules, and audit scores.";
 
     // Action Directives
@@ -400,12 +400,12 @@ function initAuditLog() {
     raw_snapshot: {
       days_since_maint: ev.raw.maintenance.days_since_last_maintenance,
       failures_90d: ev.raw.failures.failures_last_90d,
-    last_incident_severity: ev.raw.failures.last_incident_severity,
+      last_incident_severity: ev.raw.failures.last_incident_severity,
       pressure_psi: ev.raw.sensor_telemetry.pressure_psi,
       temperature_c: ev.raw.sensor_telemetry.temperature_c,
-    vibration_mms: ev.raw.sensor_telemetry.vibration_mms,
-    audit_score: ev.raw.safety_audit.audit_score,
-    unresolved_violations: ev.raw.safety_audit.unresolved_violations
+      vibration_mms: ev.raw.sensor_telemetry.vibration_mms,
+      audit_score: ev.raw.safety_audit.audit_score,
+      unresolved_violations: ev.raw.safety_audit.unresolved_violations
     }
   }));
 }
@@ -468,12 +468,12 @@ function recalculateSimulator() {
   // Update slider label texts
   document.getElementById("valMaintDays").textContent = `${maintDays} days`;
   document.getElementById("valFailures").textContent = `${failures} incident(s)`;
-  
+
   const pBase = currentSimAsset.sensor_telemetry.baseline_pressure_psi;
   const tBase = currentSimAsset.sensor_telemetry.baseline_temperature_c;
   const pPct = ((pressure - pBase) / pBase * 100).toFixed(1);
   const tPct = ((temp - tBase) / tBase * 100).toFixed(1);
-  
+
   document.getElementById("valPressure").textContent = `${pressure} PSI (${pPct >= 0 ? '+' : ''}${pPct}%)`;
   document.getElementById("valTemp").textContent = `${temp}°C (${tPct >= 0 ? '+' : ''}${tPct}%)`;
   document.getElementById("valVib").textContent = `${vib.toFixed(1)} mm/s`;
@@ -512,7 +512,7 @@ function recalculateSimulator() {
   document.getElementById("displayScore").textContent = result.risk_score.toFixed(1);
   document.getElementById("displayAssetName").textContent = `${result.asset_id} — ${result.asset_type}`;
   document.getElementById("displayAssetLocation").innerHTML = `<i class="fa-solid fa-location-dot"></i> ${escapeHtml(result.location)}`;
-  
+
   const badge = document.getElementById("displayRiskBadge");
   badge.className = `risk-chip ${result.risk_level.toLowerCase()}`;
   badge.textContent = `${result.risk_level} Risk`;
@@ -567,7 +567,7 @@ function renderQueueTable(filter = "ALL", searchQuery = "") {
 
   const filtered = currentEvaluations.filter(item => {
     const matchesFilter = (filter === "ALL") || (item.risk_level.toUpperCase() === filter.toUpperCase());
-    const matchesSearch = !query || 
+    const matchesSearch = !query ||
       item.asset_id.toLowerCase().includes(query) ||
       item.asset_type.toLowerCase().includes(query) ||
       item.location.toLowerCase().includes(query) ||
