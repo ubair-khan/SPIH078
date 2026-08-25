@@ -56,6 +56,39 @@
   --container:   1200px;
 }
 
+:root[data-theme="dark"] {
+  --white:        #0d0c0b;
+  --off-white:    #161412;
+  --gray-50:      #1e1b18;
+  --gray-100:     #2c2825;
+  --gray-200:     #44403c;
+  --gray-300:     #78716c;
+  --gray-400:     #a8a29e;
+  --gray-500:     #d6d3d1;
+  --gray-700:     #f5f5f4;
+  --black:        #ffffff;
+
+  --bg:           var(--white);
+  --bg-subtle:    var(--off-white);
+  --bg-raised:    var(--gray-50);
+  --border:       var(--gray-100);
+  --border-mid:   var(--gray-200);
+
+  --text-primary: #f5f5f4;
+  --text-secondary: #a8a29e;
+  --text-meta:    #78716c;
+
+  --accent-light: #2c1412;
+  --accent-border: #641e16;
+
+  --signal-high:     #ef4444;
+  --signal-high-bg:  #2d1212;
+  --signal-med:      #f59e0b;
+  --signal-med-bg:   #2d2112;
+  --signal-low:      #22c55e;
+  --signal-low-bg:   #122a19;
+}
+
 /* ==========================================================================
    Reset & Base
    ========================================================================== */
@@ -265,6 +298,21 @@ h1, h2, h3, h4, h5 {
   z-index: 200;
 }
 
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 28s linear infinite;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marqueeScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
 .ticker-inner {
   display: flex;
   align-items: center;
@@ -322,6 +370,11 @@ h1, h2, h3, h4, h5 {
   border-bottom: 1px solid var(--border);
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+:root[data-theme="dark"] .navbar {
+  background: rgba(13, 12, 11, 0.92);
 }
 
 .nav-inner {
@@ -416,6 +469,36 @@ h1, h2, h3, h4, h5 {
 .hero {
   padding: 100px 0 80px;
   border-bottom: 1px solid var(--border);
+  position: relative;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(12, 10, 9, 0.05) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 80% 20%, rgba(192, 57, 43, 0.04) 0%, transparent 60%);
+  background-size: 32px 32px, 100% 100%;
+  animation: heroGridPulse 10s ease-in-out infinite alternate;
+}
+
+:root[data-theme="dark"] .hero {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.07) 1.5px, transparent 1.5px),
+    radial-gradient(circle at 80% 20%, rgba(192, 57, 43, 0.12) 0%, transparent 60%);
+}
+
+@keyframes heroGridPulse {
+  0% { background-position: 0 0, 0% 0%; }
+  100% { background-position: 16px 16px, 100% 100%; }
+}
+
+/* Scroll-triggered Section Reveals */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .hero-layout {
@@ -592,6 +675,27 @@ h1, h2, h3, h4, h5 {
 .sim-panel {
   background: var(--bg);
   padding: 36px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+@keyframes alarmPulse {
+  0% {
+    box-shadow: inset 0 0 0 1px var(--accent), 0 0 0 0 rgba(192, 57, 43, 0.4);
+  }
+  50% {
+    box-shadow: inset 0 0 0 2px var(--accent), 0 0 24px 8px rgba(192, 57, 43, 0.6);
+  }
+  100% {
+    box-shadow: inset 0 0 0 1px var(--accent), 0 0 0 0 rgba(192, 57, 43, 0.4);
+  }
+}
+
+.sim-panel.danger-alarm {
+  animation: alarmPulse 1.8s infinite;
+}
+
+.score-gauge circle.gauge-fill {
+  transition: stroke-dashoffset 0.45s ease, stroke 0.45s ease;
 }
 
 .sim-panel-label {
@@ -712,9 +816,44 @@ h1, h2, h3, h4, h5 {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 2px;
+  height: 6px;
   background: var(--border-mid);
-  border-radius: 2px;
+  border-radius: 3px;
+  outline: none;
+  transition: background 0.15s ease;
+}
+
+.styled-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+
+.styled-range::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.styled-range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+
+.styled-range::-moz-range-thumb:hover {
+  transform: scale(1.15);
+}
   outline: none;
   cursor: pointer;
 }
@@ -986,12 +1125,21 @@ h1, h2, h3, h4, h5 {
 .pillar {
   background: var(--bg);
   padding: 40px 36px;
-  transition: background 0.15s;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-left-color 0.25s ease, background 0.15s;
   position: relative;
+  border-left: 3px solid transparent;
 }
 
 .pillar:hover {
   background: var(--bg-raised);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.08);
+  border-left-color: var(--accent);
+  z-index: 2;
+}
+
+:root[data-theme="dark"] .pillar:hover {
+  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.6);
 }
 
 .pillar-wide {
@@ -1062,7 +1210,7 @@ h1, h2, h3, h4, h5 {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
 }
 
@@ -1316,6 +1464,26 @@ h1, h2, h3, h4, h5 {
   transition: border-color 0.15s, background 0.15s;
 }
 
+@keyframes logSlideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-24px) scale(0.97);
+    background: var(--accent-light);
+  }
+  60% {
+    opacity: 1;
+    transform: translateX(4px) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.audit-entry.new-entry {
+  animation: logSlideIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 .audit-entry:hover {
   border-color: var(--border-mid);
   background: var(--bg-raised);
@@ -1384,15 +1552,47 @@ h1, h2, h3, h4, h5 {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  position: relative;
+}
+
+.pipeline-flow-line {
+  position: absolute;
+  left: 38px;
+  top: 30px;
+  bottom: 30px;
+  width: 2px;
+  background: var(--border-mid);
+  z-index: 1;
+}
+
+.pipeline-flow-dot {
+  position: absolute;
+  left: 35px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+  z-index: 2;
+  animation: pipelineFlowVertical 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pipelineFlowVertical {
+  0% { top: 25px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: calc(100% - 30px); opacity: 0; }
 }
 
 .pipeline-step {
   background: var(--bg);
-  padding: 24px 28px;
+  padding: 24px 28px 24px 54px;
   display: flex;
   align-items: flex-start;
   gap: 20px;
   transition: background 0.15s;
+  position: relative;
+  z-index: 2;
 }
 
 .pipeline-step:hover {
@@ -1467,20 +1667,104 @@ h1, h2, h3, h4, h5 {
   white-space: pre;
 }
 
+/* Pricing Toggle Switch */
+.pricing-toggle-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.pricing-toggle-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: color 0.15s;
+  cursor: pointer;
+}
+
+.pricing-toggle-label.active {
+  color: var(--text-primary);
+}
+
+.discount-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--signal-low);
+  background: var(--signal-low-bg);
+  border: 1px solid #bbf7d0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-left: 6px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider.round {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: var(--border-mid);
+  transition: 0.25s ease;
+  border-radius: 26px;
+}
+
+.slider.round:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--white);
+  transition: 0.25s ease;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider.round {
+  background-color: var(--black);
+}
+
+:root[data-theme="dark"] input:checked + .slider.round {
+  background-color: var(--accent);
+}
+
+input:checked + .slider.round:before {
+  transform: translateX(22px);
+}
+
 /* ==========================================================================
-   Modals
+   Modals & Glassmorphism
    ========================================================================== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(12, 10, 9, 0.5);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
+  background: rgba(12, 10, 9, 0.45);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   z-index: 1000;
   display: none;
   align-items: center;
   justify-content: center;
   padding: 24px;
+  transition: opacity 0.25s ease;
+}
+
+:root[data-theme="dark"] .modal-backdrop {
+  background: rgba(0, 0, 0, 0.7);
 }
 
 .modal-backdrop.active {
@@ -1488,8 +1772,11 @@ h1, h2, h3, h4, h5 {
 }
 
 .modal-dialog {
-  background: var(--white);
-  border: 1px solid var(--border-mid);
+  background: rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.25);
   border-radius: var(--radius-lg);
   max-width: 620px;
   width: 100%;
@@ -1497,7 +1784,13 @@ h1, h2, h3, h4, h5 {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root[data-theme="dark"] .modal-dialog {
+  background: rgba(20, 18, 16, 0.92);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.8);
 }
 
 .modal-dialog.report-dialog {

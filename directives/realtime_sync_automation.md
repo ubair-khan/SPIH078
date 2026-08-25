@@ -35,6 +35,18 @@ pip install -r requirements.txt
 uvicorn execution.api_server:app --reload --port 8787
 ```
 
+**Preferred (Windows/local dev): `execution/start_api_server.ps1`.** Running uvicorn
+directly inside an agent-tracked terminal (e.g. a Claude Code background shell) ties the
+server's lifetime to that session — the process can get torn down between sessions, which
+silently breaks the dashboard's live sync until someone notices the WebSocket error and
+manually restarts it. The script instead launches uvicorn via `Start-Process`, so it's not
+a child of the calling shell and keeps running independently of whatever started it. It's
+idempotent (no-ops if port 8787 is already listening) and safe to run before every demo:
+```powershell
+powershell -ExecutionPolicy Bypass -File execution\start_api_server.ps1
+```
+Logs go to `.tmp/api_server.log` / `.tmp/api_server.err.log`.
+
 ### API Contract
 - `GET /api/health` — liveness + connected client count.
 - `GET /api/assets` — `{ generated_at, count, evaluations[] }`, each evaluation includes

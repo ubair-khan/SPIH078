@@ -420,7 +420,11 @@ function renderHeroMetrics() {
 
   document.getElementById("metricAssetsCount").textContent = total;
   document.getElementById("metricHighRisk").textContent = high;
-  document.getElementById("highRiskCountBadge").textContent = `${high} Assets`;
+  
+  const badge1 = document.getElementById("highRiskCountBadge");
+  const badge2 = document.getElementById("highRiskCountBadgeDup");
+  if (badge1) badge1.textContent = `${high} Assets`;
+  if (badge2) badge2.textContent = `${high} Assets`;
 
   document.getElementById("countAll").textContent = total;
   document.getElementById("countHigh").textContent = high;
@@ -437,6 +441,51 @@ function renderPresetDropdown() {
     opt.textContent = `${a.asset_id} — ${a.asset_type} (${a.location})`;
     if (a.asset_id === currentSimAsset.asset_id) opt.selected = true;
     select.appendChild(opt);
+  });
+}
+
+function updateSliderTrackFills() {
+  const sliders = [
+    { id: "sliderMaintDays", min: 0, max: 400, type: "maint" },
+    { id: "sliderFailures", min: 0, max: 8, type: "fail" },
+    { id: "sliderPressure", min: 50, max: 1200, type: "pressure" },
+    { id: "sliderTemp", min: 20, max: 300, type: "temp" },
+    { id: "sliderVib", min: 0.5, max: 15.0, type: "vib" },
+    { id: "sliderAudit", min: 0, max: 100, type: "audit" }
+  ];
+
+  sliders.forEach(s => {
+    const el = document.getElementById(s.id);
+    if (!el) return;
+    const val = parseFloat(el.value);
+    const pct = Math.max(0, Math.min(100, ((val - s.min) / (s.max - s.min)) * 100));
+
+    let color = "var(--signal-low)";
+    if (s.type === "maint") {
+      if (val > 180) color = "var(--signal-high)";
+      else if (val > 90) color = "#d97706";
+    } else if (s.type === "fail") {
+      if (val >= 3) color = "var(--signal-high)";
+      else if (val >= 1) color = "#d97706";
+    } else if (s.type === "pressure") {
+      const base = currentSimAsset?.sensor_telemetry?.baseline_pressure_psi || 800;
+      const ratio = (val - base) / base;
+      if (ratio > 0.3) color = "var(--signal-high)";
+      else if (ratio > 0.15) color = "#d97706";
+    } else if (s.type === "temp") {
+      const base = currentSimAsset?.sensor_telemetry?.baseline_temperature_c || 95;
+      const ratio = (val - base) / base;
+      if (ratio > 0.25) color = "var(--signal-high)";
+      else if (ratio > 0.12) color = "#d97706";
+    } else if (s.type === "vib") {
+      if (val > 8.0) color = "var(--signal-high)";
+      else if (val > 5.0) color = "#d97706";
+    } else if (s.type === "audit") {
+      if (val < 60) color = "var(--signal-high)";
+      else if (val < 80) color = "#d97706";
+    }
+
+    el.style.background = `linear-gradient(to right, ${color} 0%, ${color} ${pct}%, var(--border-mid) ${pct}%, var(--border-mid) 100%)`;
   });
 }
 
@@ -516,6 +565,19 @@ function recalculateSimulator() {
   const badge = document.getElementById("displayRiskBadge");
   badge.className = `risk-chip ${result.risk_level.toLowerCase()}`;
   badge.textContent = `${result.risk_level} Risk`;
+
+  // Simulator Danger Zone Alarm Flash
+  const simOutputPanel = document.getElementById("simOutputPanel");
+  if (simOutputPanel) {
+    if (result.risk_level === "High" || result.risk_score >= 70) {
+      simOutputPanel.classList.add("danger-alarm");
+    } else {
+      simOutputPanel.classList.remove("danger-alarm");
+    }
+  }
+
+  // Update Dynamic Slider Fill Tracks
+  updateSliderTrackFills();
 
   // Animate Gauge SVG (Circumference of r=40 ~ 251)
   const maxDash = 251;
@@ -613,15 +675,15 @@ function renderQueueTable(filter = "ALL", searchQuery = "") {
 }
 
 // 6. Render Audit Trail Stream
-function renderAuditLog() {
+function renderAuditLog(isNewEntry = false) {
   const container = document.getElementById("auditLogStream");
   container.innerHTML = "";
 
   document.getElementById("auditLogCountBadge").textContent = `${auditLogEntries.length} entries`;
 
-  auditLogEntries.slice(0, 30).forEach(entry => {
+  auditLogEntries.slice(0, 30).forEach((entry, idx) => {
     const div = document.createElement("div");
-    div.className = "audit-entry";
+    div.className = (isNewEntry && idx === 0) ? "audit-entry new-entry" : "audit-entry";
     const riskClass = entry.risk_level.toLowerCase();
 
     div.innerHTML = `
@@ -751,7 +813,121 @@ function closeReportModal() {
   document.getElementById("reportModalBackdrop").classList.remove("active");
 }
 
-// 8b. Live Sync Wiring
+// 8b. Theme Management
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  const btn = document.getElementById("btnThemeToggle");
+  const txt = document.getElementById("themeToggleText");
+  if (btn && txt) {
+    const isDark = theme === "dark";
+    const icon = btn.querySelector("i");
+    if (icon) icon.className = isDark ? "fa-solid fa-sun" : "fa-solid fa-moon";
+    txt.textContent = isDark ? "Light" : "Dark";
+  }
+  try {
+    localStorage.setItem("riskpulse_theme", theme);
+  } catch (e) {}
+}
+
+function initTheme() {
+  const saved = localStorage.getItem("riskpulse_theme") || "light";
+  applyTheme(saved);
+  const btn = document.getElementById("btnThemeToggle");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme") || "light";
+      applyTheme(current === "dark" ? "light" : "dark");
+    });
+  }
+}
+
+// 8c. Scroll Reveals & Metric Count-Up Animations
+function animateCountUp(elementId, targetVal, duration, suffix = "", startVal = 0) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const startTime = performance.now();
+
+  function step(currentTime) {
+    const progress = Math.min((currentTime - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(startVal + (targetVal - startVal) * eased);
+    el.textContent = `${current}${suffix}`;
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = `${targetVal}${suffix}`;
+    }
+  }
+  requestAnimationFrame(step);
+}
+
+function initScrollAnimations() {
+  const revealElements = document.querySelectorAll(".reveal");
+  if ('IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("active");
+        }
+      });
+    }, { threshold: 0.1 });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // Metrics block count-up trigger
+    const metricsBlock = document.querySelector(".metrics-block");
+    let animatedMetrics = false;
+
+    if (metricsBlock) {
+      const metricsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting && !animatedMetrics) {
+            animatedMetrics = true;
+            animateCountUp("metricAssetsCount", currentEvaluations.length, 1200);
+            const highCount = currentEvaluations.filter(e => e.risk_level === "High").length;
+            animateCountUp("metricHighRisk", highCount, 1000);
+            animateCountUp("metricExplainability", 100, 1400, "%");
+            animateCountUp("metricAuditLatency", 0, 800, " ms", 150);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      metricsObserver.observe(metricsBlock);
+    }
+  } else {
+    revealElements.forEach(el => el.classList.add("active"));
+  }
+}
+
+// 8d. Pricing Annual/Monthly Billing Toggle
+function initPricingToggle() {
+  const toggle = document.getElementById("pricingToggle");
+  const labelMonthly = document.getElementById("labelMonthly");
+  const labelAnnual = document.getElementById("labelAnnual");
+  const priceStarter = document.getElementById("priceStarter");
+  const pricePro = document.getElementById("pricePro");
+
+  if (!toggle) return;
+
+  const updatePrices = () => {
+    const isAnnual = toggle.checked;
+    if (labelMonthly) labelMonthly.classList.toggle("active", !isAnnual);
+    if (labelAnnual) labelAnnual.classList.toggle("active", isAnnual);
+
+    if (priceStarter) {
+      priceStarter.innerHTML = isAnnual ? `$12<span>/ asset / mo (billed annually)</span>` : `$15<span>/ asset / mo</span>`;
+    }
+    if (pricePro) {
+      pricePro.innerHTML = isAnnual ? `$28<span>/ asset / mo (billed annually)</span>` : `$35<span>/ asset / mo</span>`;
+    }
+  };
+
+  toggle.addEventListener("change", updatePrices);
+  if (labelMonthly) labelMonthly.addEventListener("click", () => { toggle.checked = false; updatePrices(); });
+  if (labelAnnual) labelAnnual.addEventListener("click", () => { toggle.checked = true; updatePrices(); });
+}
+
+// 8e. Live Sync Wiring
 function setLiveStatus(connected) {
   const dot = document.getElementById("wsStatusDot");
   const label = document.getElementById("wsStatusLabel");
@@ -763,15 +939,17 @@ function startFakeTicker() {
   if (fakeTickerInterval) return;
   fakeTickerInterval = setInterval(() => {
     const gas = document.getElementById("tickerGas");
+    const gasDup = document.getElementById("tickerGasDup");
     const boil = document.getElementById("tickerBoil");
-    if (gas) {
-      const p = (890 + Math.random() * 8).toFixed(1);
-      gas.innerHTML = `COMP-003 Pressure: <strong class="t-warn">${p} PSI (+11.8%)</strong>`;
-    }
-    if (boil) {
-      const t = (247 + Math.random() * 4).toFixed(1);
-      boil.innerHTML = `BOIL-004 Temp: <strong class="t-danger">${t}°C (+18.4%)</strong>`;
-    }
+    const boilDup = document.getElementById("tickerBoilDup");
+    const p = (890 + Math.random() * 8).toFixed(1);
+    const t = (247 + Math.random() * 4).toFixed(1);
+    const gasHtml = `COMP-003 Pressure: <strong class="t-warn">${p} PSI (+11.8%)</strong>`;
+    const boilHtml = `BOIL-004 Temp: <strong class="t-danger">${t}°C (+18.4%)</strong>`;
+    if (gas) gas.innerHTML = gasHtml;
+    if (gasDup) gasDup.innerHTML = gasHtml;
+    if (boil) boil.innerHTML = boilHtml;
+    if (boilDup) boilDup.innerHTML = boilHtml;
   }, 3500);
 }
 
@@ -793,19 +971,23 @@ function renderLiveTickerFromChanges(changes) {
   if (!changes || changes.length === 0) return;
   stopFakeTicker();
   const gas = document.getElementById("tickerGas");
+  const gasDup = document.getElementById("tickerGasDup");
   const boil = document.getElementById("tickerBoil");
+  const boilDup = document.getElementById("tickerBoilDup");
   const cls = (level) => level === "High" ? "t-danger" : (level === "Medium" ? "t-warn" : "t-good");
   const fmt = (n) => (typeof n === "number" ? n.toFixed(1) : n);
 
-  if (gas && changes[0]) {
+  if (changes[0]) {
     const c = changes[0];
-    gas.innerHTML = `${escapeHtml(c.asset_id)} Pressure: <strong class="${cls(c.risk_level)}">${fmt(c.pressure_psi)} PSI</strong>`;
+    const html = `${escapeHtml(c.asset_id)} Pressure: <strong class="${cls(c.risk_level)}">${fmt(c.pressure_psi)} PSI</strong>`;
+    if (gas) gas.innerHTML = html;
+    if (gasDup) gasDup.innerHTML = html;
   }
-  if (boil) {
-    const c = changes[1] || changes[0];
-    if (c) {
-      boil.innerHTML = `${escapeHtml(c.asset_id)} Temp: <strong class="${cls(c.risk_level)}">${fmt(c.temperature_c)}°C</strong>`;
-    }
+  const c2 = changes[1] || changes[0];
+  if (c2) {
+    const html = `${escapeHtml(c2.asset_id)} Temp: <strong class="${cls(c2.risk_level)}">${fmt(c2.temperature_c)}°C</strong>`;
+    if (boil) boil.innerHTML = html;
+    if (boilDup) boilDup.innerHTML = html;
   }
 }
 
@@ -926,12 +1108,15 @@ function connectLiveSync() {
 
 // 9. Event Listeners & Bootstrapping
 document.addEventListener("DOMContentLoaded", () => {
+  initTheme();
   initAuditLog();
   renderHeroMetrics();
   renderPresetDropdown();
   updateSimulatorSlidersFromCurrentAsset();
   renderQueueTable();
   renderAuditLog();
+  initScrollAnimations();
+  initPricingToggle();
 
   // Preset Select change
   document.getElementById("assetPresetSelect").addEventListener("change", (e) => {
@@ -993,7 +1178,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
     auditLogEntries.unshift(newEntry);
-    renderAuditLog();
+    renderAuditLog(true);
     alert(`[✓] Assessment for ${res.asset_id} successfully signed and committed to Audit Trail!`);
   });
 

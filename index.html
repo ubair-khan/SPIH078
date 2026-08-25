@@ -50,18 +50,29 @@
 
   <!-- Live Telemetry Ticker Bar -->
   <div class="ticker-bar" id="liveTickerBar">
-    <div class="ticker-inner">
-      <span class="ticker-live"><span class="live-dot" id="wsStatusDot"></span> <span id="wsStatusLabel">Live</span></span>
-      <span class="ticker-sep">·</span>
-      <span class="ticker-item" id="tickerGas">COMP-003 Pressure: <strong class="t-warn">892 PSI
-          (+11.5%)</strong></span>
-      <span class="ticker-sep">·</span>
-      <span class="ticker-item" id="tickerBoil">BOIL-004 Temp: <strong class="t-danger">248°C (+18.1%)</strong></span>
-      <span class="ticker-sep">·</span>
-      <span class="ticker-item" id="tickerAudit">Fleet Health: <strong class="t-good">94.2% Operational</strong></span>
-      <span class="ticker-sep">·</span>
-      <span class="ticker-item" id="tickerIncidents">Critical Queue: <strong class="t-danger" id="highRiskCountBadge">6
-          assets</strong></span>
+    <div class="ticker-track">
+      <div class="ticker-inner">
+        <span class="ticker-live"><span class="live-dot" id="wsStatusDot"></span> <span id="wsStatusLabel">Live</span></span>
+        <span class="ticker-sep">·</span>
+        <span class="ticker-item" id="tickerGas">COMP-003 Pressure: <strong class="t-warn">892 PSI (+11.5%)</strong></span>
+        <span class="ticker-sep">·</span>
+        <span class="ticker-item" id="tickerBoil">BOIL-004 Temp: <strong class="t-danger">248°C (+18.1%)</strong></span>
+        <span class="ticker-sep">·</span>
+        <span class="ticker-item" id="tickerAudit">Fleet Health: <strong class="t-good">94.2% Operational</strong></span>
+        <span class="ticker-sep">·</span>
+        <span class="ticker-item" id="tickerIncidents">Critical Queue: <strong class="t-danger" id="highRiskCountBadge">6 assets</strong></span>
+      </div>
+      <div class="ticker-inner" aria-hidden="true">
+        <span class="ticker-live"><span class="live-dot"></span> <span>Live</span></span>
+        <span class="ticker-sep">·</span>
+        <span class="ticker-item" id="tickerGasDup">COMP-003 Pressure: <strong class="t-warn">892 PSI (+11.5%)</strong></span>
+        <span class="ticker-sep">·</span>
+        <span class="ticker-item" id="tickerBoilDup">BOIL-004 Temp: <strong class="t-danger">248°C (+18.1%)</strong></span>
+        <span class="ticker-sep">·</span>
+        <span class="ticker-item">Fleet Health: <strong class="t-good">94.2% Operational</strong></span>
+        <span class="ticker-sep">·</span>
+        <span class="ticker-item">Critical Queue: <strong class="t-danger" id="highRiskCountBadgeDup">6 assets</strong></span>
+      </div>
     </div>
   </div>
 
@@ -86,6 +97,9 @@
       </nav>
 
       <div class="nav-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="btnThemeToggle" aria-label="Toggle Dark Mode" title="Toggle Dark/Light Mode">
+          <i class="fa-solid fa-moon"></i> <span id="themeToggleText">Dark</span>
+        </button>
         <a href="https://github.com/ubair-khan/SPIH078" target="_blank" rel="noopener noreferrer"
           class="btn btn-secondary btn-sm">
           <i class="fa-brands fa-github"></i> GitHub
@@ -110,7 +124,7 @@
         <div class="hero-layout">
 
           <!-- Left: Headline & CTA -->
-          <div class="hero-left">
+          <div class="hero-left reveal">
             <div class="hero-eyebrow">
               <span class="hero-number mono">001</span>
               <span class="hero-separator"></span>
@@ -143,7 +157,7 @@
           </div>
 
           <!-- Right: Key Metrics -->
-          <div class="hero-right">
+          <div class="hero-right reveal">
             <div class="metrics-block">
               <div class="metric-item">
                 <div class="metric-num" id="metricAssetsCount">25</div>
@@ -156,12 +170,12 @@
                 <div class="metric-sub">Immediate action required</div>
               </div>
               <div class="metric-item">
-                <div class="metric-num">100%</div>
+                <div class="metric-num" id="metricExplainability">100%</div>
                 <div class="metric-label">Explainability Coverage</div>
                 <div class="metric-sub">Plain-language reasoning</div>
               </div>
               <div class="metric-item">
-                <div class="metric-num">0 ms</div>
+                <div class="metric-num" id="metricAuditLatency">0 ms</div>
                 <div class="metric-label">Audit Latency</div>
                 <div class="metric-sub">Tamper-evident logging</div>
               </div>
@@ -178,7 +192,7 @@
     <section class="section simulator-section" id="simulator">
       <div class="container">
 
-        <div class="section-head">
+        <div class="section-head reveal">
           <span class="section-num mono">002</span>
           <div class="section-head-content">
             <div class="section-label">Interactive Sandbox</div>
@@ -191,7 +205,7 @@
         <div class="simulator-grid">
 
           <!-- Control Panel -->
-          <div class="sim-panel">
+          <div class="sim-panel reveal">
             <div class="sim-panel-label">Input Parameters</div>
             <div class="sim-panel-title">
               <i class="fa-solid fa-sliders"></i> Asset Telemetry &amp; Logs
@@ -289,7 +303,7 @@
           </div>
 
           <!-- Output Panel -->
-          <div class="sim-panel">
+          <div class="sim-panel sim-output-panel reveal" id="simOutputPanel">
             <div class="sim-panel-label">Live Assessment</div>
             <div class="sim-panel-title">
               <i class="fa-solid fa-brain"></i> Scoring &amp; Reasoning
@@ -395,7 +409,7 @@
     <section class="section bento-section" id="features">
       <div class="container">
 
-        <div class="section-head">
+        <div class="section-head reveal">
           <span class="section-num mono">003</span>
           <div class="section-head-content">
             <div class="section-label">Core System Pillars</div>
@@ -408,7 +422,7 @@
         <div class="pillars-grid">
 
           <!-- 01 Explainability — wide -->
-          <div class="pillar pillar-wide">
+          <div class="pillar pillar-wide reveal">
             <span class="pillar-num mono">01</span>
             <div class="pillar-icon"><i class="fa-solid fa-comments"></i></div>
             <div class="pillar-title">Plain-Language Explainability</div>
@@ -422,7 +436,7 @@
           </div>
 
           <!-- 02 Ranking -->
-          <div class="pillar">
+          <div class="pillar reveal">
             <span class="pillar-num mono">02</span>
             <div class="pillar-icon"><i class="fa-solid fa-arrow-down-short-wide"></i></div>
             <div class="pillar-title">Inspection Priority Ranking</div>
@@ -431,7 +445,7 @@
           </div>
 
           <!-- 03 Directives -->
-          <div class="pillar">
+          <div class="pillar reveal">
             <span class="pillar-num mono">03</span>
             <div class="pillar-icon"><i class="fa-solid fa-compass-drafting"></i></div>
             <div class="pillar-title">Actionable Directives</div>
@@ -440,7 +454,7 @@
           </div>
 
           <!-- 04 Messy Data -->
-          <div class="pillar">
+          <div class="pillar reveal">
             <span class="pillar-num mono">04</span>
             <div class="pillar-icon"><i class="fa-solid fa-database"></i></div>
             <div class="pillar-title">Messy Data Resilience</div>
@@ -449,7 +463,7 @@
           </div>
 
           <!-- 05 Audit Trail — full width -->
-          <div class="pillar pillar-full">
+          <div class="pillar pillar-full reveal">
             <div>
               <span class="pillar-num mono">05</span>
               <div class="pillar-icon"><i class="fa-solid fa-fingerprint"></i></div>
@@ -476,7 +490,7 @@
     <section class="section queue-section" id="inspection-queue">
       <div class="container">
 
-        <div class="section-head">
+        <div class="section-head reveal">
           <span class="section-num mono">004</span>
           <div class="section-head-content">
             <div class="section-label">Field Operations</div>
@@ -486,7 +500,7 @@
           </div>
         </div>
 
-        <div class="queue-toolbar">
+        <div class="queue-toolbar reveal">
           <div class="search-wrap">
             <i class="fa-solid fa-magnifying-glass"></i>
             <input type="text" id="queueSearchInput" placeholder="Search asset ID, type, or location…"
@@ -504,7 +518,7 @@
         </div>
         <div id="liveSurgeStatus" class="live-surge-status" style="display:none;"></div>
 
-        <div class="table-wrap">
+        <div class="table-wrap reveal">
           <table class="data-table" id="inspectionTable">
             <thead>
               <tr>
@@ -533,7 +547,7 @@
     <section class="section audit-section" id="audit-log">
       <div class="container">
 
-        <div class="section-head">
+        <div class="section-head reveal">
           <span class="section-num mono">005</span>
           <div class="section-head-content">
             <div class="section-label">Compliance &amp; Governance</div>
@@ -543,7 +557,7 @@
           </div>
         </div>
 
-        <div class="audit-card">
+        <div class="audit-card reveal">
           <div class="audit-header">
             <div class="audit-title">
               <div class="audit-title-text"><i class="fa-solid fa-terminal"></i> .tmp/audit_log.jsonl</div>
@@ -585,7 +599,9 @@
         <div class="iot-layout">
 
           <!-- Pipeline Steps -->
-          <div class="pipeline-steps">
+          <div class="pipeline-steps reveal">
+            <div class="pipeline-flow-line"></div>
+            <div class="pipeline-flow-dot"></div>
             <div class="pipeline-step">
               <span class="step-num mono">01</span>
               <div class="step-content">
@@ -618,7 +634,7 @@
           </div>
 
           <!-- Code Reference -->
-          <div class="code-block">
+          <div class="code-block reveal">
             <div class="code-block-header">
               <span class="code-block-title">execution/stream_subscriber.py</span>
               <span class="label-meta">Reference Implementation</span>
@@ -650,7 +666,7 @@ def on_telemetry_packet(event):
     <section class="section pricing-section" id="pricing">
       <div class="container">
 
-        <div class="section-head">
+        <div class="section-head reveal">
           <span class="section-num mono">007</span>
           <div class="section-head-content">
             <div class="section-label">Business Model</div>
@@ -660,11 +676,21 @@ def on_telemetry_packet(event):
           </div>
         </div>
 
+        <!-- Annual/Monthly Toggle -->
+        <div class="pricing-toggle-wrap reveal">
+          <span class="pricing-toggle-label active" id="labelMonthly">Monthly Billing</span>
+          <label class="switch" aria-label="Toggle Annual or Monthly Billing">
+            <input type="checkbox" id="pricingToggle">
+            <span class="slider round"></span>
+          </label>
+          <span class="pricing-toggle-label" id="labelAnnual">Annual Billing <span class="discount-badge">Save 20%</span></span>
+        </div>
+
         <div class="pricing-grid">
 
-          <div class="pricing-card">
+          <div class="pricing-card reveal">
             <div class="pricing-tier">Starter</div>
-            <div class="pricing-price">$15<span>/ asset / mo</span></div>
+            <div class="pricing-price" id="priceStarter">$15<span>/ asset / mo</span></div>
             <p class="pricing-desc">Batch scoring for smaller sites getting started.</p>
             <ul class="pricing-features">
               <li><i class="fa-solid fa-check"></i> Up to 50 assets, single site</li>
@@ -673,10 +699,10 @@ def on_telemetry_packet(event):
             </ul>
           </div>
 
-          <div class="pricing-card featured">
+          <div class="pricing-card featured reveal">
             <div class="pricing-badge">Most Common</div>
             <div class="pricing-tier">Pro</div>
-            <div class="pricing-price">$35<span>/ asset / mo</span></div>
+            <div class="pricing-price" id="pricePro">$35<span>/ asset / mo</span></div>
             <p class="pricing-desc">Live telemetry sync for active safety operations.</p>
             <ul class="pricing-features">
               <li><i class="fa-solid fa-check"></i> Everything in Starter</li>
@@ -686,7 +712,7 @@ def on_telemetry_packet(event):
             </ul>
           </div>
 
-          <div class="pricing-card">
+          <div class="pricing-card reveal">
             <div class="pricing-tier">Enterprise</div>
             <div class="pricing-price">Custom</div>
             <p class="pricing-desc">Multi-site fleets with compliance &amp; SLA needs.</p>
